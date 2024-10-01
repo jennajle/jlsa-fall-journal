@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 env:
-  PYTHONPATH: /home/runner/work/jl-fall-journal/jl-fall-journal/
+  PYTHONPATH: /home/runner/work/jlsa-fall-journal/jlsa-fall-journal/
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
