@@ -24,6 +24,7 @@ TITLE = '...'
 DATE_RESP = 'Date'
 DATE = '2024-10-02'
 
+
 @api.route(HELLO_EP)
 class HelloWorld(Resource):
     """
@@ -50,6 +51,7 @@ class Endpoints(Resource):
         """
         endpoints = sorted(rule.rule for rule in api.app.url_map.iter_rules())
         return {"Available endpoints": endpoints}
+
 
 @api.route(TITLE_EP)
 class JournalTitle(Resource):
