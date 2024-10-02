@@ -18,7 +18,8 @@ ENDPOINT_EP = '/endpoints'
 ENDPOINT_RESP = 'Available endpoints'
 HELLO_EP = '/hello'
 HELLO_RESP = 'hello'
-
+JOURNAL_EP = '/journal'
+JOURNAL_RESP = 'Journal name'
 
 @api.route(HELLO_EP)
 class HelloWorld(Resource):
@@ -46,3 +47,14 @@ class Endpoints(Resource):
         """
         endpoints = sorted(rule.rule for rule in api.app.url_map.iter_rules())
         return {"Available endpoints": endpoints}
+
+@api.route(JOURNAL_EP)
+class Journal(Resource):
+    """
+    This class will give the name of the journal.
+    """
+    def get(self):
+        """
+        The 'get()' method will return the name of the journal.
+        """
+        return {JOURNAL_RESP: "jlsa-fall-journal"}
