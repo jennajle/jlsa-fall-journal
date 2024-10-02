@@ -21,7 +21,12 @@ all_tests: FORCE
 dev_env: FORCE
 	pip install -r $(REQ_DIR)/requirements-dev.txt
 	@echo "You should set PYTHONPATH to: "
+<<<<<<< HEAD
     @echo $(shell pwd)
 	
+=======
+    	@echo $(shell pwd)
+
+>>>>>>> 43d0360a17d86d32dbb474a65a57910fa635c5c2
 docs: FORCE
 	cd $(API_DIR); make docs
