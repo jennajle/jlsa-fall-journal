@@ -21,6 +21,8 @@ HELLO_RESP = 'hello'
 TITLE_EP = '/title'
 TITLE_RESP = 'Title'
 TITLE = '...'
+EDITORS_RESP = 'Editors'
+EDITORS = 'Alex, Leo, Jenna, Sejuti'
 DATE_RESP = 'Date'
 DATE = '2024-10-02'
 
@@ -64,5 +66,6 @@ class JournalTitle(Resource):
         """
         return {
             TITLE_RESP: TITLE,
+            EDITORS_RESP: EDITORS,
             DATE_RESP: DATE
         }
