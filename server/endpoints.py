@@ -10,6 +10,8 @@ from flask_cors import CORS
 
 # import werkzeug.exceptions as wz
 
+import data.people as ppl
+
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
@@ -25,6 +27,7 @@ EDITORS_RESP = 'Editors'
 EDITORS = 'Alex, Leo, Jenna, Sejuti'
 DATE_RESP = 'Date'
 DATE = '2024-10-02'
+PEOPLE_EP = '/people'
 
 
 @api.route(HELLO_EP)
@@ -69,3 +72,16 @@ class JournalTitle(Resource):
             EDITORS_RESP: EDITORS,
             DATE_RESP: DATE
         }
+
+
+@api.route(PEOPLE_EP)
+class People(Resource):
+    def get(self):
+        return ppl.get_people()
+
+
+@api.route(f'{PEOPLE_EP}/<_id>')
+class Person(Resource):
+    def delete(self, _id):
+        ret = ppl.delete_person(_id)
+        return {'Message': ret}
