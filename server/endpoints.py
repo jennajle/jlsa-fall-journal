@@ -5,16 +5,24 @@ The endpoint called `endpoints` will return all available endpoints.
 # from http import HTTPStatus
 
 from flask import Flask  # , request
-from flask_restx import Resource, Api  # Namespace, fields
+from flask_restx import Resource, Api, fields  # Namespace, fields
 from flask_cors import CORS
-
 # import werkzeug.exceptions as wz
+
+from flask import request
 
 import data.people as ppl
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
+
+person_model = api.model('Person', {
+    'name': fields.String(required=True, description='The person\'s name', min_length=2),
+    'roles': fields.List(fields.String, description='The roles of the person', default=[]),
+    'affiliation': fields.String(description='The affiliation of the person', default=''),
+    'email': fields.String(required=True, description='The email of the person'),
+})
 
 ENDPOINT_EP = '/endpoints'
 ENDPOINT_RESP = 'Available endpoints'
@@ -79,13 +87,21 @@ class People(Resource):
     def get(self):
         return ppl.get_people()
 
+    @api.doc('create_person')
+    @api.expect(person_model)
+    @api.response(201, 'Person created successfully')
+    @api.response(400, 'Invalid input or person already exists')
+    def post(self):
+        form_data = request.json
+        ret = ppl.create_person(form_data)
+        if ret is None:
+            return {'Message': 'Failed to create person, person may already exist or data is invalid'}, 400
+
+        return {'Message': 'Person created successfully', 'Person': ret}, 201
+
 
 @api.route(f'{PEOPLE_EP}/<_id>')
 class Person(Resource):
     def delete(self, _id):
         ret = ppl.delete_person(_id)
         return {'Message': ret}
-    def post(self, _id):
-        ret = ppl.create_person(_id)
-        return {'Message': ret}
-
