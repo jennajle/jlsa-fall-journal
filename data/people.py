@@ -22,9 +22,9 @@ TEST_PERSON_DICT = {
     },
 }
 
+people = TEST_PERSON_DICT
 
 def get_people():
-    people = TEST_PERSON_DICT
     return people
 
 
@@ -35,3 +35,17 @@ def delete_person(_id):
         return _id
     else:
         return None
+
+def create_person(_id):
+    people = get_people()
+    if _id in people:
+        print("Person already exists!")
+        return None
+    else:
+        people[_id] = {
+            NAME: "NEW PERSON",
+            ROLES: [],
+            AFFILIATION: '',
+            EMAIL: ""
+        }
+        return _id

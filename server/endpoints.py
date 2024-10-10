@@ -85,3 +85,7 @@ class Person(Resource):
     def delete(self, _id):
         ret = ppl.delete_person(_id)
         return {'Message': ret}
+    def post(self, _id):
+        ret = ppl.create_person(_id)
+        return {'Message': ret}
+
