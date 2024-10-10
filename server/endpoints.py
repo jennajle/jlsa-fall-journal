@@ -18,10 +18,14 @@ CORS(app)
 api = Api(app)
 
 person_model = api.model('Person', {
-    'name': fields.String(required=True, description='The person\'s name', min_length=2),
-    'roles': fields.List(fields.String, description='The roles of the person', default=[]),
-    'affiliation': fields.String(description='The affiliation of the person', default=''),
-    'email': fields.String(required=True, description='The email of the person'),
+    'name': fields.String(required=True, description='The person\'s name',
+                          min_length=2),
+    'roles': fields.List(fields.String, description='The roles of the person',
+                         default=[]),
+    'affiliation': fields.String(description='The affiliation of the person',
+                                 default=''),
+    'email': fields.String(required=True,
+                           description='The email of the person'),
 })
 
 ENDPOINT_EP = '/endpoints'
@@ -95,7 +99,10 @@ class People(Resource):
         form_data = request.json
         ret = ppl.create_person(form_data)
         if ret is None:
-            return {'Message': 'Failed to create person, person may already exist or data is invalid'}, 400
+            return {'Message':
+                    'Failed to create person,' +
+                    'person may already exist or data is invalid'
+                    }, 400
 
         return {'Message': 'Person created successfully', 'Person': ret}, 201
 

@@ -24,6 +24,7 @@ TEST_PERSON_DICT = {
 
 people = TEST_PERSON_DICT
 
+
 def get_people():
     return people
 
@@ -35,6 +36,7 @@ def delete_person(_id):
         return _id
     else:
         return None
+
 
 def create_person(form_data):
     people = get_people()
