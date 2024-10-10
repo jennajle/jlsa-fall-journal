@@ -38,16 +38,20 @@ def delete_person(_id):
         return None
 
 
-def create_person(_id):
+def create_person(form_data):
     people = get_people()
-    if _id in people:
-        print("Person already exists!")
+    email = form_data.get('email')
+    new_id = email
+    name = form_data.get('name')
+
+    if email in TEST_PERSON_DICT:
+        print("Person already exists")
         return None
-    else:
-        people[_id] = {
-            NAME: "NEW PERSON",
-            ROLES: [],
-            AFFILIATION: '',
-            EMAIL: ""
-        }
-        return _id
+
+    people[new_id] = {
+        NAME: name,
+        ROLES: form_data.get('roles', []),
+        AFFILIATION: form_data.get('affiliation', ''),
+        EMAIL: email,
+    }
+    return people[new_id]
