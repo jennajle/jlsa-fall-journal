@@ -25,8 +25,24 @@ text_dict = {
 }
 
 
-def create():
-    pass
+def create(key: str, title: str, text: str, email: str = None) -> bool:
+    """ 
+    Creates a new entry in text_dict if it is a unique key.
+    """
+    if key in text_dict:
+        print(f"Key '{key}' already exists.")
+        return False
+
+    new_entry = {
+        TITLE: title,
+        TEXT: text,
+    }
+
+    if email:
+        new_entry[EMAIL] = email
+    
+    text_dict[key] = new_entry
+    return True
 
 
 def delete():
