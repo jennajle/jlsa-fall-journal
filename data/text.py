@@ -10,6 +10,7 @@ SUBM_KEY = 'SubmissionsPage'
 DEL_KEY = 'DeletePage'
 texts = {}
 
+
 text_dict = {
     TEST_KEY: {
         TITLE: 'Home Page',
@@ -45,8 +46,14 @@ def create(key: str, title: str, text: str, email: str = None) -> bool:
     return True
 
 
-def delete():
-    pass
+def delete(key):
+    """
+    Deletes a text entry.
+    """
+    if key not in texts:
+        raise ValueError(f"Entry for '{key}' does not exist.")
+    del texts[key]
+    return f"Entry '{key}' deleted."
 
 
 def update(key, value):
