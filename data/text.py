@@ -8,6 +8,7 @@ EMAIL = 'email'
 TEST_KEY = 'HomePage'
 SUBM_KEY = 'SubmissionsPage'
 DEL_KEY = 'DeletePage'
+texts = {}
 
 text_dict = {
     TEST_KEY: {
@@ -48,8 +49,14 @@ def delete():
     pass
 
 
-def update():
-    pass
+def update(key, value):
+    """
+    Updates an existing text entry.
+    """
+    if key not in texts:
+        raise ValueError(f"Entry for '{key}' does not exist.")
+    texts[key] = value
+    return f"Entry '{key}' updated."
 
 
 def read():
