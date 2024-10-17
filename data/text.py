@@ -26,7 +26,7 @@ text_dict = {
 
 
 def create(key: str, title: str, text: str, email: str = None) -> bool:
-    """ 
+    """
     Creates a new entry in text_dict if it is a unique key.
     """
     if key in text_dict:
@@ -40,7 +40,6 @@ def create(key: str, title: str, text: str, email: str = None) -> bool:
 
     if email:
         new_entry[EMAIL] = email
-    
     text_dict[key] = new_entry
     return True
 
