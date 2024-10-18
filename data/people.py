@@ -1,3 +1,7 @@
+"""
+This module interfaces to our people data
+"""
+
 MIN_USER_NAME_LEN = 2
 NAME = 'name'
 ROLES = 'roles'

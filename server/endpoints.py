@@ -89,6 +89,9 @@ class JournalTitle(Resource):
 @api.route(PEOPLE_EP)
 class People(Resource):
     def get(self):
+        """
+        This method lists all persons
+        """
         return ppl.get_people()
 
     @api.doc('create_person')
@@ -96,6 +99,9 @@ class People(Resource):
     @api.response(201, 'Person created successfully')
     @api.response(400, 'Invalid input or person already exists')
     def post(self):
+        """
+        This method creates a person
+        """
         form_data = request.json
         ret = ppl.create_person(form_data)
         if ret is None:
@@ -110,5 +116,8 @@ class People(Resource):
 @api.route(f'{PEOPLE_EP}/<_id>')
 class Person(Resource):
     def delete(self, _id):
+        """
+        This method deletes a person
+        """
         ret = ppl.delete_person(_id)
         return {'Message': ret}
