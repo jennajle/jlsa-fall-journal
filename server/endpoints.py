@@ -106,11 +106,29 @@ class People(Resource):
         ret = ppl.create_person(form_data)
         if ret is None:
             return {'Message':
-                    'Failed to create person,' +
+                    'Failed to create person, ' +
                     'person may already exist or data is invalid'
                     }, 400
 
         return {'Message': 'Person created successfully', 'Person': ret}, 201
+
+    @api.doc('update_person')
+    @api.expect(person_model)
+    @api.response(201, 'Person created successfully')
+    @api.response(400, 'Invalid input or person does not exist')
+    def put(self):
+        """
+        This method updates an existing person
+        """
+        form_data = request.json
+        ret = ppl.update_person(form_data)
+        if ret is None:
+            return {'Message':
+                    'Failed to create person, ' +
+                    'person may not exist yet!'
+                    }, 400
+
+        return {'Message': 'Person updated successfully', 'Person': ret}, 201
 
 
 @api.route(f'{PEOPLE_EP}/<_id>')

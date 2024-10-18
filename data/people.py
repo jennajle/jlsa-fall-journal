@@ -59,3 +59,22 @@ def create_person(form_data):
         EMAIL: email,
     }
     return people[new_id]
+
+
+def update_person(form_data):
+    people = get_people()
+    email = form_data.get('email')
+    new_id = email
+    name = form_data.get('name')
+
+    if email not in TEST_PERSON_DICT:
+        print("Person does not exist yet!")
+        return None
+
+    people[new_id] = {
+        NAME: name,
+        ROLES: form_data.get('roles', []),
+        AFFILIATION: form_data.get('affiliation', ''),
+        EMAIL: email,
+    }
+    return people[new_id]
