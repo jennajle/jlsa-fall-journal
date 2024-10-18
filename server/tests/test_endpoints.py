@@ -49,4 +49,15 @@ def test_create_person():
     assert resp.status_code == 201  # Success
     assert 'Person created successfully' in resp_json['Message']
 
+def test_delete_person():
+    existing_person = {
+        'name': 'John Doe',
+        'roles': ['Researcher'],
+        'affiliation': 'NYU',
+        'email': 'johndoe@nyu.edu'
+    }
 
+    resp = TEST_CLIENT.delete(f"{ep.PEOPLE_EP}/johndoe@nyu.edu")
+    resp_json = resp.get_json()
+    assert resp.status_code == 200
+    assert 'Person deleted successfully' in resp_json['Message']

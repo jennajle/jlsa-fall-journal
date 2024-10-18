@@ -138,4 +138,4 @@ class Person(Resource):
         This method deletes a person
         """
         ret = ppl.delete_person(_id)
-        return {'Message': ret}
+        return {'Message': 'Person deleted successfully', 'Person': ret}
