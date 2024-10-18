@@ -35,3 +35,18 @@ def test_get_people():
     resp_json= resp.get_json()
     assert isinstance(resp_json, dict)
     assert resp.status_code == 200 # server has successfully processed request
+
+def test_create_person():
+    valid_person_data = {
+        'name': 'John Doe',
+        'roles': ['Researcher'],
+        'affiliation': 'NYU',
+        'email': 'johndoe@nyu.edu'
+    }
+
+    resp = TEST_CLIENT.post(ep.PEOPLE_EP, json=valid_person_data)
+    resp_json = resp.get_json()
+    assert resp.status_code == 201  # Success
+    assert 'Person created successfully' in resp_json['Message']
+
+
