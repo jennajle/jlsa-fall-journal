@@ -59,6 +59,8 @@ def create_person(form_data):
     if email in TEST_PERSON_DICT:
         print("Person already exists")
         return None
+    elif not is_valid_email(email):
+        return None
 
     people[new_id] = {
         NAME: name,
@@ -77,6 +79,8 @@ def update_person(form_data):
 
     if email not in TEST_PERSON_DICT:
         print("Person does not exist yet!")
+        return None
+    elif not is_valid_email(email):
         return None
 
     people[new_id] = {
