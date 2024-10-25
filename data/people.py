@@ -37,6 +37,7 @@ CHAR_OR_DIGIT = '[A-Za-z0-9]'
 def is_valid_email(email: str) -> bool:
     return re.match(f"{CHAR_OR_DIGIT}.*@{CHAR_OR_DIGIT}.*", email)
 
+
 def is_valid_person(name: str, affiliation: str, email: str) -> bool:
     if email in people_dict:
         raise ValueError(f'Adding duplicate {email=}')
