@@ -28,7 +28,7 @@ TEST_PERSON_DICT = {
     },
 }
 
-people = TEST_PERSON_DICT
+people_dict = TEST_PERSON_DICT
 
 
 CHAR_OR_DIGIT = '[A-Za-z0-9]'
@@ -37,9 +37,16 @@ CHAR_OR_DIGIT = '[A-Za-z0-9]'
 def is_valid_email(email: str) -> bool:
     return re.match(f"{CHAR_OR_DIGIT}.*@{CHAR_OR_DIGIT}.*", email)
 
+def is_valid_person(name: str, affiliation: str, email: str) -> bool:
+    if email in people_dict:
+        raise ValueError(f'Adding duplicate {email=}')
+    if not is_valid_email(email):
+        raise ValueError(f'Invalid email: {email}')
+    return True
+
 
 def get_people():
-    return people
+    return people_dict
 
 
 def delete_person(_id):
