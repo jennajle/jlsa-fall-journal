@@ -2,6 +2,7 @@
 This module interfaces to our people data
 """
 import re
+import data.roles as rls
 
 MIN_USER_NAME_LEN = 2
 NAME = 'name'
@@ -55,16 +56,21 @@ def create_person(form_data):
     email = form_data.get('email')
     new_id = email
     name = form_data.get('name')
+    person_roles = form_data.get('roles', [])
 
     if email in TEST_PERSON_DICT:
         print("Person already exists")
         return None
     elif not is_valid_email(email):
-        return None
+        raise ValueError("Invalid Email:", email)
+
+    for role in person_roles:
+        if not rls.is_valid(role):
+            raise ValueError("Bad Role:", role)
 
     people[new_id] = {
         NAME: name,
-        ROLES: form_data.get('roles', []),
+        ROLES: person_roles,
         AFFILIATION: form_data.get('affiliation', ''),
         EMAIL: email,
     }
@@ -76,16 +82,21 @@ def update_person(form_data):
     email = form_data.get('email')
     new_id = email
     name = form_data.get('name')
+    new_roles = form_data.get('roles', [])
 
     if email not in TEST_PERSON_DICT:
         print("Person does not exist yet!")
         return None
     elif not is_valid_email(email):
-        return None
+        raise ValueError("Invalid Email:", email)
+
+    for role in new_roles:
+        if not rls.is_valid(role):
+            raise ValueError("Bad Role:", role)
 
     people[new_id] = {
         NAME: name,
-        ROLES: form_data.get('roles', []),
+        ROLES: new_roles,
         AFFILIATION: form_data.get('affiliation', ''),
         EMAIL: email,
     }

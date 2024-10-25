@@ -39,7 +39,7 @@ def test_get_people():
 def test_create_person():
     valid_person_data = {
         'name': 'John Doe',
-        'roles': ['Researcher'],
+        'roles': ['AU'],
         'affiliation': 'NYU',
         'email': 'johndoe@nyu.edu'
     }
@@ -52,7 +52,7 @@ def test_create_person():
 def test_delete_person():
     existing_person = {
         'name': 'John Doe',
-        'roles': ['Researcher'],
+        'roles': ['AU'],
         'affiliation': 'NYU',
         'email': 'johndoe@nyu.edu'
     }
