@@ -43,7 +43,11 @@ def get_role_codes() -> list:
 def is_valid(code: str) -> bool:
     return code in ROLES
 
-
+def validate_roles(roles: list[str]) -> None:
+    invalid_roles = [role for role in roles if role not in ROLES]
+    if invalid_roles:
+        raise ValueError(f"Invalid roles: {invalid_roles}")
+    
 def main():
     print(get_roles())
     print(get_masthead_roles())
