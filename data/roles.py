@@ -9,13 +9,14 @@ TEST_CODE = AUTHOR_CODE
 ED_CODE = 'ED'
 ME_CODE = 'ME'
 CE_CODE = 'CE'
+RE_CODE = 'RE'
 
 ROLES = {
-    AUTHOR_CODE: 'Author',
-    CE_CODE: 'Consulting Editor',
-    ED_CODE: 'Editor',
-    ME_CODE: 'Managing Editor',
-    'RE': 'Referee',
+    AUTHOR_CODE: {'name': 'Author', 'description': 'Writes articles'},
+    CE_CODE: {'name': 'Consulting Editor', 'description': 'Provides editorial consulting'},
+    ED_CODE: {'name': 'Editor', 'description': 'Oversees the editorial process'},
+    ME_CODE: {'name': 'Managing Editor', 'description': 'Manages editorial operations'},
+    RE_CODE: {'name': 'Referee', 'description': 'Reviews submissions'},
 }
 
 MH_ROLES = [CE_CODE, ED_CODE, ME_CODE]
@@ -26,14 +27,7 @@ def get_roles() -> dict:
 
 
 def get_masthead_roles() -> dict:
-    mh_roles = get_roles()
-    del_mh_roles = []
-    for role in mh_roles:
-        if role not in MH_ROLES:
-            del_mh_roles.append(role)
-    for del_role in del_mh_roles:
-        del mh_roles[del_role]
-    return mh_roles
+    return {code: role for code, role in ROLES.items() if 'Editor' in role['name']}
 
 
 def get_role_codes() -> list:
