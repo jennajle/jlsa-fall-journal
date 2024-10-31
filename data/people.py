@@ -50,6 +50,10 @@ def get_people():
     return people_dict
 
 
+def read_one(email: str) -> dict:
+    return people_dict.get(email)
+
+
 def delete_person(_id):
     people = get_people()
     if _id in people:
