@@ -46,8 +46,8 @@ def is_valid_person(name: str, affiliation: str, email: str) -> bool:
     return True
 
 
-def read_one(email: str) -> dict:
-    return people_dict.get(email)
+def get_people():
+    return people_dict
 
 
 def delete_person(_id):
