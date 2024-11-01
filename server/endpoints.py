@@ -102,8 +102,9 @@ class People(Resource):
 
     @api.doc('create_person')
     @api.expect(person_model)
-    @api.response(201, 'Person created successfully')
-    @api.response(400, 'Invalid input or person already exists')
+    @api.response(HTTPStatus.CREATED, 'Person created successfully')
+    @api.response(HTTPStatus.BAD_REQUEST,
+                  'Invalid input or person already exists')
     def post(self):
         """
         This method creates a person
@@ -114,9 +115,11 @@ class People(Resource):
             return {'Message':
                     'Failed to create person, ' +
                     'person may already exist or data is invalid'
-                    }, 400
+                    }, HTTPStatus.BAD_REQUEST
 
-        return {'Message': 'Person created successfully', 'Person': ret}, 201
+        return {'Message': 'Person created successfully',
+                'Person': ret
+                }, HTTPStatus.CREATED
 
     @api.doc('update_person')
     @api.expect(person_model)
