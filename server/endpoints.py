@@ -12,6 +12,7 @@ from flask_cors import CORS
 from flask import request
 
 import data.people as ppl
+# import data.roles as rls
 
 app = Flask(__name__)
 CORS(app)
@@ -28,18 +29,22 @@ person_model = api.model('Person', {
                            description='The email of the person'),
 })
 
+DATE = '2024-10-02'
+DATE_RESP = 'Date'
+EDITORS = 'Alex, Leo, Jenna, Sejuti'  # professor had this in email format
+EDITORS_RESP = 'Editors'
 ENDPOINT_EP = '/endpoints'
 ENDPOINT_RESP = 'Available endpoints'
 HELLO_EP = '/hello'
 HELLO_RESP = 'hello'
+MESSAGE = 'Message'
+PEOPLE_EP = '/people'
+PUBLISHER = 'Palgave'
+PUBLISHER_RESP = 'Publisher'
+RETURN = 'return'
+TITLE = '...'
 TITLE_EP = '/title'
 TITLE_RESP = 'Title'
-TITLE = '...'
-EDITORS_RESP = 'Editors'
-EDITORS = 'Alex, Leo, Jenna, Sejuti'
-DATE_RESP = 'Date'
-DATE = '2024-10-02'
-PEOPLE_EP = '/people'
 
 
 @api.route(HELLO_EP)
