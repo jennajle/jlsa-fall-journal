@@ -1,4 +1,5 @@
 import pytest
+
 import data.people as ppl
 
 from data.roles import TEST_CODE as TEST_ROLE_CODE
@@ -12,6 +13,7 @@ DOMAIN_TOO_LONG = 'kajshd@nyu.eedduu'
 
 TEMP_EMAIL = 'temp_person@temp.org'
 
+
 @pytest.fixture(scope='function')
 def temp_person():
     _id = ppl.create_person({
@@ -23,10 +25,20 @@ def temp_person():
     yield _id
     ppl.delete_person(_id)
 
+
 def test_has_role(temp_person):
     person_rec = ppl.read_one(temp_person)
     assert ppl.has_role(person_rec, TEST_ROLE_CODE)
 
+
 def test_doesnt_have_role(temp_person):
     person_rec = ppl.read_one(temp_person)
     assert not ppl.has_role(person_rec, 'Not a good role!')
+
+
+def test_is_valid_email_no_at():
+    assert not ppl.is_valid_email(NO_AT)
+
+
+def test_is_valid_no_name():
+    assert not ppl.is_valid_email(NO_NAME)
