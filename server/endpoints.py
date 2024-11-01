@@ -139,7 +139,7 @@ class People(Resource):
 
 @api.route(f'{PEOPLE_EP}/<_id>')
 class Person(Resource):
-    @api.response(HTTPStatus.OK, 'Person deleted successfully')  # 200
+    @api.response(HTTPStatus.OK, 'Person deleted successfully')  # code 200
     @api.response(HTTPStatus.NOT_FOUND, 'No such person')  # 404
     def delete(self, _id):
         """
