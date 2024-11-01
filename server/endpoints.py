@@ -2,7 +2,7 @@
 This is the file containing all of the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
-# from http import HTTPStatus
+from http import HTTPStatus
 
 from flask import Flask  # , request
 from flask_restx import Resource, Api, fields  # Namespace, fields
@@ -87,7 +87,8 @@ class JournalTitle(Resource):
         return {
             TITLE_RESP: TITLE,
             EDITORS_RESP: EDITORS,
-            DATE_RESP: DATE
+            DATE_RESP: DATE,
+            PUBLISHER_RESP: PUBLISHER,
         }
 
 
@@ -138,6 +139,8 @@ class People(Resource):
 
 @api.route(f'{PEOPLE_EP}/<_id>')
 class Person(Resource):
+    @api.response(HTTPStatus.OK, 'Person deleted successfully')  # code 200
+    @api.response(HTTPStatus.NOT_FOUND, 'No such person')  # 404
     def delete(self, _id):
         """
         This method deletes a person
