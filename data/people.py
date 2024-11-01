@@ -138,17 +138,11 @@ def create_mh_rec(person: dict) -> dict:
 
 def get_masthead() -> dict:
     masthead = {}
-    masthead_roles = rls.get_masthead_roles()
-    people_data = read()
-
-    for role_code, role_name in masthead_roles.items():
-        people_with_role = [
-            create_mh_rec(person)
-            for _id, person in people_data.items()
-            if has_role(person, role_code)
-        ]
-        masthead[role_name] = people_with_role
-
+    mh_roles = rls.get_masthead_roles()
+    people = read()
+    for mh_role, role_name in mh_roles.items():
+        people_w_role = [create_mh_rec(person) for _id, person in people.items() if has_role(person, mh_role)]
+        masthead[role_name] = people_w_role
     return masthead
 
 
