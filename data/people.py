@@ -120,7 +120,9 @@ def has_role(person: dict, role: str) -> bool:
         return True
     return False
 
+
 MH_FIELDS = [NAME, AFFILIATION]
+
 
 def create_mh_rec(person: dict) -> dict:
     mh_rec = {}
