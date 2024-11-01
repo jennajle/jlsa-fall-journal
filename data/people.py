@@ -91,7 +91,7 @@ def create_person(form_data):
         AFFILIATION: form_data.get('affiliation', ''),
         EMAIL: email,
     }
-    return people[new_id][EMAIL]
+    return people[new_id]
 
 
 def update_person(form_data):
