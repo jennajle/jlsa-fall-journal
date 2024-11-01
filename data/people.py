@@ -49,6 +49,9 @@ def is_valid_person(name: str, affiliation: str, email: str) -> bool:
 def get_people():
     return people_dict
 
+def read() -> dict:
+    people = people_dict
+    return people
 
 def read_one(email: str) -> dict:
     return people_dict.get(email)
@@ -129,3 +132,27 @@ def create_mh_rec(person: dict) -> dict:
     for field in MH_FIELDS:
         mh_rec[field] = person.get(field, '')
     return mh_rec
+
+
+def get_masthead() -> dict:
+    masthead = {}
+    masthead_roles = rls.get_masthead_roles()
+    people_data = read()
+
+    for role_code, role_name in masthead_roles.items():
+        people_with_role = [
+            create_mh_rec(person)
+            for _id, person in people_data.items()
+            if has_role(person, role_code)
+        ]
+        masthead[role_name] = people_with_role
+
+    return masthead
+
+
+def main():
+    print(get_masthead())
+    
+
+if __name__ == '__main__':
+    main()
