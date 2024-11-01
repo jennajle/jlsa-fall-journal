@@ -7,3 +7,8 @@ def test_get_roles():
     for code, role in roles.items():
         assert isinstance(code,str)
         assert isinstance(role,str)
+
+
+def test_get_masthead_roles():
+    mh_roles = rls.get_masthead_roles()
+    assert isinstance(mh_roles, dict)
