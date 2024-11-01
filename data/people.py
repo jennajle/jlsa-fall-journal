@@ -119,3 +119,11 @@ def has_role(person: dict, role: str) -> bool:
     if role in person.get(ROLES):
         return True
     return False
+
+MH_FIELDS = [NAME, AFFILIATION]
+
+def create_mh_rec(person: dict) -> dict:
+    mh_rec = {}
+    for field in MH_FIELDS:
+        mh_rec[field] = person.get(field, '')
+    return mh_rec
