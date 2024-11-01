@@ -151,5 +151,7 @@ class Person(Resource):
         This method deletes a person
         """
         ret = ppl.delete_person(_id)
+        if ret is None:
+            return {'Message': 'Person not found'}, HTTPStatus.NOT_FOUND
         return {'Message': 'Person deleted successfully', 'Person': ret
                 }, HTTPStatus.OK
