@@ -42,11 +42,14 @@ def is_valid_email(email: str) -> bool:
                         + "{2,3}", email)
 
 
-def is_valid_person(name: str, affiliation: str, email: str) -> bool:
+def is_valid_person(name: str, affiliation: str,
+                    email: str, role: str) -> bool:
     if email in people_dict:
         raise ValueError(f'Adding duplicate {email=}')
     if not is_valid_email(email):
         raise ValueError(f'Invalid email: {email}')
+    if not rls.is_valid(role):
+        raise ValueError(f'Invalid role: {role}')
     return True
 
 
@@ -142,6 +145,15 @@ def create_mh_rec(person: dict) -> dict:
     for field in MH_FIELDS:
         mh_rec[field] = person.get(field, '')
     return mh_rec
+
+
+# add role
+def create(name: str, affiliation: str, email: str, role: str):
+    if is_valid_person(name, affiliation, email, role):
+        roles = [role]
+        people_dict[email] = {NAME: name, AFFILIATION: affiliation,
+                              EMAIL: email, ROLES: roles}
+    return email
 
 
 def get_masthead() -> dict:
