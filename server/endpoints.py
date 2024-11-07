@@ -139,3 +139,15 @@ class Person(Resource):
         """
         ret = ppl.delete_person(_id)
         return {'Message': 'Person deleted successfully', 'Person': ret}
+
+    def get(self, _id):
+        """
+        Retrieve a single person's info
+        """
+        person = ppl.read_one(_id)
+        if person:
+            return person
+        else:
+            return {'Message':
+                    'Failed to retrieve person!'
+                    }, 400
