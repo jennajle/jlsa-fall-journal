@@ -147,15 +147,6 @@ def create_mh_rec(person: dict) -> dict:
     return mh_rec
 
 
-# add role
-def create(name: str, affiliation: str, email: str, role: str):
-    if is_valid_person(name, affiliation, email, role):
-        roles = [role]
-        people_dict[email] = {NAME: name, AFFILIATION: affiliation,
-                              EMAIL: email, ROLES: roles}
-    return email
-
-
 def get_masthead() -> dict:
     masthead = {}
     masthead_roles = rls.get_masthead_roles()
@@ -170,6 +161,13 @@ def get_masthead() -> dict:
         masthead[role_name] = people_with_role
 
     return masthead
+
+def create(name: str, affiliation: str, email: str, role: str):
+    if is_valid_person(name, affiliation, email, role):
+        roles = [role]
+        people_dict[email] = {NAME: name, AFFILIATION: affiliation,
+                              EMAIL: email, ROLES: roles}
+    return email
 
 
 def main():
