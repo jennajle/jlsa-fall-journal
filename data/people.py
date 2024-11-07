@@ -137,6 +137,14 @@ def update_person(form_data):
     return people[new_id]
 
 
+def add_role(email: str, role: str):
+    person = read_one(email)
+    if not rls.is_valid(role):
+        raise ValueError("Invalid role")
+    if role not in person[ROLES]:
+        person[ROLES].append(role)
+
+
 def has_role(person: dict, role: str) -> bool:
     if role in person.get(ROLES):
         return True
