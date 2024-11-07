@@ -13,6 +13,8 @@ import pytest
 
 import server.endpoints as ep
 
+from data.people import NAME
+
 TEST_CLIENT = ep.app.test_client()
 
 def test_hello():
@@ -61,3 +63,14 @@ def test_delete_person():
     resp_json = resp.get_json()
     assert resp.status_code == 200
     assert 'Person deleted successfully' in resp_json['Message']
+
+@patch('data.people.read_one', autospec=True,
+       return_value={NAME: 'Joe Schmoe'})
+def test_read_one(mock_read):
+    resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/mock_id')
+    assert resp.status_code == OK
+
+@patch('data.people.read_one', autospec=True, return_value=None)
+def test_read_one_not_found(mock_read):
+    resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/mock_id')
+    assert resp.status_code == NOT_FOUND

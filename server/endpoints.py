@@ -150,4 +150,4 @@ class Person(Resource):
         else:
             return {'Message':
                     'Failed to retrieve person!'
-                    }, 400
+                    }, 404
