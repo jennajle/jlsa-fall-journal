@@ -129,6 +129,10 @@ def has_role(person: dict, role: str) -> bool:
 MH_FIELDS = [NAME, AFFILIATION]
 
 
+def get_mh_fields(journal_code=None) -> list:
+    return MH_FIELDS
+
+
 def create_mh_rec(person: dict) -> dict:
     mh_rec = {}
     for field in MH_FIELDS:

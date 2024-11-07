@@ -26,6 +26,12 @@ def temp_person():
     ppl.delete_person(_id)
 
 
+def test_get_mh_fields():
+    flds = ppl.get_mh_fields()
+    assert isinstance(flds, list)
+    assert len(flds) > 0
+
+
 def test_has_role(temp_person):
     person_rec = ppl.read_one(temp_person)
     assert ppl.has_role(person_rec, TEST_ROLE_CODE)
