@@ -69,6 +69,10 @@ def read() -> dict:
 
 
 def read_one(email: str) -> dict:
+    """
+    Return a person record if email present in DB,
+    else None
+    """
     return people_dict.get(email)
 
 
