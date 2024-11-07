@@ -26,6 +26,15 @@ def temp_person():
     ppl.delete_person(_id)
 
 
+def test_read_one(temp_person):
+    assert ppl.read_one(temp_person) is not None
+
+
+def test_get_masthead():
+    mh = ppl.get_masthead()
+    assert isinstance(mh, dict)
+
+
 def test_get_mh_fields():
     flds = ppl.get_mh_fields()
     assert isinstance(flds, list)
