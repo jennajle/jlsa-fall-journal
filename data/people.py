@@ -162,6 +162,7 @@ def get_masthead() -> dict:
 
     return masthead
 
+
 def create(name: str, affiliation: str, email: str, role: str):
     if is_valid_person(name, affiliation, email, role):
         roles = [role]
