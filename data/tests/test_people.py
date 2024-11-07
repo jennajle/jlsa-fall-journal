@@ -2,7 +2,7 @@ import pytest
 
 import data.people as ppl
 
-from data.roles import TEST_CODE as TEST_ROLE_CODE, TEST_CODE
+from data.roles import TEST_CODE as TEST_ROLE_CODE
 
 NO_AT = 'jkajsd'
 NO_NAME = '@kalsj'
@@ -66,11 +66,16 @@ def test_is_valid_email_no_at():
 def test_is_valid_no_name():
     assert not ppl.is_valid_email(NO_NAME)
 
+
+def test_is_valid_no_domain():
+    assert not ppl.is_valid_email(NO_DOMAIN)
+
+
 ADD_EMAIL = 'joe@nyu.edu'
 def test_create():
     people = ppl.read()
     assert ADD_EMAIL not in people
-    ppl.create('Joe Smith', 'NYU', ADD_EMAIL, TEST_CODE)
+    ppl.create('Joe Smith', 'NYU', ADD_EMAIL, TEST_ROLE_CODE)
     people = ppl.read()
     assert ADD_EMAIL in people
 
