@@ -79,3 +79,9 @@ def test_create():
     people = ppl.read()
     assert ADD_EMAIL in people
 
+
+def test_create_duplicate():
+    with pytest.raises(ValueError):
+        ppl.create('Do not care about name',
+                   'Or affiliation', ppl.TEST_EMAIL, TEST_ROLE_CODE)
+
