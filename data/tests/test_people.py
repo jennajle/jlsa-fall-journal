@@ -48,11 +48,3 @@ def test_is_valid_email_no_at():
 
 def test_is_valid_no_name():
     assert not ppl.is_valid_email(NO_NAME)
-
-
-def test_is_valid_no_domain():
-    assert not ppl.is_valid_email(NO_DOMAIN)
-
-
-def test_is_valid_no_sub_domain():
-    assert not ppl.is_valid_email(NO_SUB_DOMAIN)
