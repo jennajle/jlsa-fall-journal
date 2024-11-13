@@ -74,7 +74,7 @@ def test_is_valid_no_domain():
 
 ADD_EMAIL = 'joe@nyu.edu'
 @patch('data.people.read')
-@patch('data.people.create')
+@patch('data.people.create', autospec=True)
 def test_create(patch_create, patch_read):
     patch_create.return_value = ADD_EMAIL
     patch_read.return_value = {}
