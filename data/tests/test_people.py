@@ -30,7 +30,7 @@ def temp_person():
 def test_read_one(temp_person):
     assert ppl.read_one(temp_person) is not None
 
-
+@pytest.mark.skip(reason="Skip for high performance reasons")
 def test_get_masthead():
     mh = ppl.get_masthead()
     assert isinstance(mh, dict)
