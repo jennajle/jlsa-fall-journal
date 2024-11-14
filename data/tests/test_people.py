@@ -80,6 +80,15 @@ def test_is_valid_email_domain_too_long():
     assert not ppl.is_valid_email(DOMAIN_TOO_LONG)
 
 
+def test_read():
+    people = ppl.read()
+    assert isinstance(people, dict)
+    assert len(people) > 0
+    for _id, person in people.items():
+        assert isinstance(_id, str)
+        assert ppl.NAME in person
+
+
 ADD_EMAIL = 'joe@nyu.edu'
 @patch('data.people.read')
 @patch('data.people.create', autospec=True)
