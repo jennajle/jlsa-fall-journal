@@ -72,6 +72,14 @@ def test_is_valid_no_domain():
     assert not ppl.is_valid_email(NO_DOMAIN)
 
 
+def test_is_valid_email_domain_too_short():
+    assert not ppl.is_valid_email(DOMAIN_TOO_SHORT)
+
+
+def test_is_valid_email_domain_too_long():
+    assert not ppl.is_valid_email(DOMAIN_TOO_LONG)
+
+
 ADD_EMAIL = 'joe@nyu.edu'
 @patch('data.people.read')
 @patch('data.people.create', autospec=True)
