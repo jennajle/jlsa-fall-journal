@@ -64,6 +64,17 @@ def test_delete_person():
     assert resp.status_code == 200
     assert 'Person deleted successfully' in resp_json['Message']
 
+@patch('data.people.read', autospec=True,
+       return_value={'id': {NAME: 'Joe Schmoe'}})
+def test_read(mock_read):
+    resp = TEST_CLIENT.get(ep.PEOPLE_EP)
+    assert resp.status_code == OK
+    resp_json = resp.get_json()
+    for _id, person in resp_json.items():
+        assert isinstance(_id, str)
+        assert len(_id) > 0
+        assert NAME in person
+
 @patch('data.people.read_one', autospec=True,
        return_value={NAME: 'Joe Schmoe'})
 def test_read_one(mock_read):
