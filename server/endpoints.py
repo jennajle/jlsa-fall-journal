@@ -151,3 +151,12 @@ class Person(Resource):
             return {'Message':
                     'Failed to retrieve person!'
                     }, 404
+
+
+MASTHEAD = 'Masthead'
+
+
+@api.route(f'{PEOPLE_EP}/masthead')
+class Masthead(Resource):
+    def get(self):
+        return {MASTHEAD: ppl.get_masthead()}
