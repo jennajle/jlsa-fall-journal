@@ -186,10 +186,8 @@ def create(name: str, affiliation: str, email: str, role: str):
         roles = []
         if role:
             roles.append(role)
-        person = {NAME: name, AFFILIATION: affiliation,
-                  EMAIL: email, ROLES: roles}
-        print(person)
-        dbc.create(PEOPLE_COLLECT, person)
+        people_dict[email] = {NAME: name, AFFILIATION: affiliation,
+                              EMAIL: email, ROLES: roles}
     return email
 
 
