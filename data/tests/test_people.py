@@ -13,16 +13,17 @@ DOMAIN_TOO_SHORT = 'kajshd@nyu.e'
 DOMAIN_TOO_LONG = 'kajshd@nyu.eedduu'
 
 TEMP_EMAIL = 'temp_person@temp.org'
+TEMP_PERSON_RECORD = {
+    'name': 'John Doe',
+    'affiliation': 'NYU',
+    'email': TEMP_EMAIL,
+    'roles': ['AU']
+}
 
 
 @pytest.fixture(scope='function')
 def temp_person():
-    _id = ppl.create_person({
-        'name': 'John Doe',
-        'roles': ['AU'],
-        'affiliation': 'NYU',
-        'email': TEMP_EMAIL
-    })
+    _id = ppl.create_person(TEMP_PERSON_RECORD)
     yield _id
     ppl.delete_person(_id)
 
@@ -42,9 +43,13 @@ def test_get_mh_fields():
     assert len(flds) > 0
 
 
-def test_create_mh_rec(temp_person):
-    person_rec = ppl.read_one(temp_person)
+@patch('data.people.read_one', autospec=True)
+def test_create_mh_rec(mock_read_one):
+    mock_read_one.return_value = TEMP_PERSON_RECORD
+
+    person_rec = ppl.read_one(TEMP_EMAIL)
     mh_rec = ppl.create_mh_rec(person_rec)
+
     assert isinstance(mh_rec, dict)
     for field in ppl.MH_FIELDS:
         assert field in mh_rec
