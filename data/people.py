@@ -2,8 +2,10 @@
 This module interfaces to our people data
 """
 import re
+import data.db_connect as dbc
 import data.roles as rls
 
+PEOPLE_COLLECT = 'people'
 MIN_USER_NAME_LEN = 2
 NAME = 'name'
 ROLES = 'roles'
@@ -29,6 +31,9 @@ TEST_PERSON_DICT = {
 }
 
 people_dict = TEST_PERSON_DICT
+
+client = dbc.connect_db()
+print(f'{client=}')
 
 
 CHAR_OR_DIGIT = '[A-Za-z0-9]'
@@ -64,8 +69,9 @@ def get_people():
 
 
 def read() -> dict:
-    print('read() has been called')
-    return people_dict
+    people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
+    print(f'{people=}')
+    return people
 
 
 def read_one(email: str) -> dict:
