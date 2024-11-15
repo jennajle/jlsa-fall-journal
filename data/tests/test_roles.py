@@ -11,17 +11,9 @@ def test_get_roles():
         assert isinstance(role,str)
 
 
-@patch('data.roles.get_masthead_roles',  autospec=True)
-def test_get_masthead_roles(patch_get_masthead_roles):
-    patch_get_masthead_roles.return_value = {"CE": "Consulting Editor",
-                                             "ED": "Editor",
-                                             "ME": "Managing Editor"}
-
+def test_get_masthead_roles():
     mh_roles = rls.get_masthead_roles()
     assert isinstance(mh_roles, dict)
-    assert patch_get_masthead_roles.called
-    patch_get_masthead_roles.assert_called_once()
-
 
 def test_get_role_codes():
     codes = rls.get_role_codes()

@@ -69,9 +69,8 @@ def get_people():
 
 
 def read() -> dict:
-    people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
-    print(f'{people=}')
-    return people
+    print('read() has been called')
+    return people_dict
 
 
 def read_one(email: str) -> dict:
