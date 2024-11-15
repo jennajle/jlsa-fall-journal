@@ -1,6 +1,7 @@
 import data.roles as rls
 
 from unittest.mock import patch
+import data.people as ppl
 
 def test_get_roles():
     roles = rls.get_roles()
@@ -32,3 +33,19 @@ def test_get_role_codes():
 
 def test_is_valid():
     assert rls.is_valid(rls.TEST_CODE)
+
+
+@patch("data.people.read_one", autospec=True)
+def test_remove_role(mock_read_one):
+    test_email = "bob@nyu.edu"
+    test_role = "AU"
+    mock_person = {
+        "name": "Bob",
+        "email": test_email,
+        "roles": [test_role, "ED"],
+        "affiliation": "NYU"
+    }
+
+    mock_read_one.return_value = mock_person
+    ppl.remove_role(test_email, test_role)
+    assert test_role not in mock_person["roles"]
