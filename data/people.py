@@ -69,9 +69,8 @@ def get_people():
 
 
 def read() -> dict:
-    people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
-    print(f'{people=}')
-    return people
+    print('read() has been called')
+    return people_dict
 
 
 def read_one(email: str) -> dict:
@@ -192,8 +191,10 @@ def create(name: str, affiliation: str, email: str, role: str):
         roles = []
         if role:
             roles.append(role)
-        people_dict[email] = {NAME: name, AFFILIATION: affiliation,
-                              EMAIL: email, ROLES: roles}
+        person = {NAME: name, AFFILIATION: affiliation,
+                  EMAIL: email, ROLES: roles}
+        print(person)
+        dbc.create(PEOPLE_COLLECT, person)
     return email
 
 
