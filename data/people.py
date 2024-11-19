@@ -179,7 +179,7 @@ def get_mh_fields(journal_code=None) -> list:
 
 def create_mh_rec(person: dict) -> dict:
     mh_rec = {}
-    for field in MH_FIELDS:
+    for field in get_mh_fields():
         mh_rec[field] = person.get(field, '')
     return mh_rec
 
