@@ -151,17 +151,19 @@ def add_role(email: str, role: str):
 
 
 def remove_role(email: str, role: str):
+    # Check if email exists in the data
+    person = read_one(email)
+    if not person:
+        raise ValueError(f"Person with email '{email}' not found")
     # Check if role exists
     if not rls.is_valid(role):
-        raise ValueError("Invalid role")
-
+        raise ValueError(f"Invalid role: {role}")
     # Check if person is assigned role
-    person = read_one(email)
     if role not in person[ROLES]:
-        raise ValueError(f"Role {role} is not assigned to email {email}.")
+        raise ValueError(f"Role {role} is not assigned to email {email}")
 
     person[ROLES].remove(role)
-    print(f"Removed role '{role}' from email '{email}'.")
+    print(f"Removed role {role} from email {email}")
 
 
 def has_role(person: dict, role: str) -> bool:
