@@ -143,11 +143,17 @@ def update_person(form_data):
 
 
 def add_role(email: str, role: str):
+    # Check if email exists in the data
     person = read_one(email)
+    if not person:
+        raise ValueError(f"Person with email '{email}' not found")
+    # Check if role exists
     if not rls.is_valid(role):
-        raise ValueError("Invalid role")
+        raise ValueError(f"Invalid role: {role}")
+
     if role not in person[ROLES]:
         person[ROLES].append(role)
+    return email
 
 
 def remove_role(email: str, role: str):
@@ -163,7 +169,7 @@ def remove_role(email: str, role: str):
         raise ValueError(f"Role {role} is not assigned to email {email}")
 
     person[ROLES].remove(role)
-    print(f"Removed role {role} from email {email}")
+    return email
 
 
 def has_role(person: dict, role: str) -> bool:
