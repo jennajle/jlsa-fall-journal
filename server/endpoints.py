@@ -168,6 +168,10 @@ class RoleManagement(Resource):
         """
         This method adds a role to a person.
         """
+        person = ppl.read_one(_id)
+        if not person:
+            raise wz.NotFound(f"Person with email {_id} not found")
+
         try:
             ppl.add_role(_id, role)
             return {
