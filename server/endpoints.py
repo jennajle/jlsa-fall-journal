@@ -7,7 +7,7 @@ The endpoint called `endpoints` will return all available endpoints.
 from flask import Flask  # , request
 from flask_restx import Resource, Api, fields  # Namespace, fields
 from flask_cors import CORS
-# import werkzeug.exceptions as wz
+import werkzeug.exceptions as wz
 
 from flask import request
 
@@ -160,3 +160,25 @@ MASTHEAD = 'Masthead'
 class Masthead(Resource):
     def get(self):
         return {MASTHEAD: ppl.get_masthead()}
+
+
+@api.route(f'{PEOPLE_EP}/<_id>/roles/<role>')
+class RoleManagement(Resource):
+    def delete(self, _id, role):
+        """
+         This method removes a role from a person.
+        """
+        person = ppl.read_one(_id)
+        if not person:
+            raise wz.NotFound(f"Person with email {_id} not found")
+
+        try:
+            ppl.remove_role(_id, role)
+            return {
+                'Message': (
+                    f"Role {role} removed successfully "
+                    f"from person with email {_id}")
+            }, 200
+
+        except ValueError as e:
+            return {'Message': str(e)}, 400
