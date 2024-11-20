@@ -164,6 +164,20 @@ class Masthead(Resource):
 
 @api.route(f'{PEOPLE_EP}/<_id>/roles/<role>')
 class RoleManagement(Resource):
+    def post(self, _id, role):
+        """
+        This method adds a role to a person.
+        """
+        try:
+            ppl.add_role(_id, role)
+            return {
+                'Message': (
+                    f"Role {role} added successfully "
+                    f"to person with email {_id}")
+            }, 200
+        except ValueError as e:
+            return {'Message': str(e)}, 400
+
     def delete(self, _id, role):
         """
          This method removes a role from a person.
@@ -179,6 +193,5 @@ class RoleManagement(Resource):
                     f"Role {role} removed successfully "
                     f"from person with email {_id}")
             }, 200
-
         except ValueError as e:
             return {'Message': str(e)}, 400
