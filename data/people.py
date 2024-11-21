@@ -50,8 +50,6 @@ def is_valid_email(email: str) -> bool:
 def is_valid_person(name: str, affiliation: str,
                     email: str,
                     role: str, roles: list = None) -> bool:
-    if email in people_dict:
-        raise ValueError(f'Adding duplicate {email=}')
     if not is_valid_email(email):
         raise ValueError(f'Invalid email: {email}')
     if role:
@@ -69,8 +67,13 @@ def get_people():
 
 
 def read() -> dict:
-    print('read() has been called')
-    return people_dict
+    people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
+    print(f'{people=}')
+    return people
+
+
+def exists(email: str) -> bool:
+    return read_one(email) is not None
 
 
 def read_one(email: str) -> dict:
@@ -78,7 +81,7 @@ def read_one(email: str) -> dict:
     Return a person record if email present in DB,
     else None
     """
-    return people_dict.get(email)
+    return dbc.read_one(PEOPLE_COLLECT, {EMAIL: email})
 
 
 def delete(email: str):
@@ -113,29 +116,15 @@ def create_person(form_data):
 
 
 def update_person(form_data):
-    people = get_people()
-    email = form_data.get('email')
-    new_id = email
-    name = form_data.get('name')
-    new_roles = form_data.get('roles', [])
-
-    if email not in TEST_PERSON_DICT:
-        print("Person does not exist yet!")
-        return None
-    elif not is_valid_email(email):
-        raise ValueError("Invalid Email:", email)
-
-    for role in new_roles:
-        if not rls.is_valid(role):
-            raise ValueError("Bad Role:", role)
-
-    people[new_id] = {
-        NAME: name,
-        ROLES: new_roles,
-        AFFILIATION: form_data.get('affiliation', ''),
-        EMAIL: email,
-    }
-    return people[new_id]
+    if not exists(email):
+        raise ValueError(f'Updating non-existent person: {email=}')
+    if is_valid_person(name, affiliation, email, roles=roles):
+        ret = dbc.update(PEOPLE_COLLECT,
+                         {EMAIL: email},
+                         {NAME: name, AFFILIATION: affiliation,
+                          EMAIL: email, ROLES: roles})
+        print(f'{ret=}')
+        return email
 
 
 def add_role(email: str, role: str):
@@ -201,7 +190,9 @@ def get_masthead() -> dict:
 
 
 def create(name: str, affiliation: str, email: str, role: str):
-    if is_valid_person(name, affiliation, email, role):
+    if exists(email):
+        raise ValueError(f'Adding duplicate {email=}')
+    if is_valid_person(name, affiliation, email, role=role):
         roles = []
         if role:
             roles.append(role)
@@ -209,7 +200,7 @@ def create(name: str, affiliation: str, email: str, role: str):
                   EMAIL: email, ROLES: roles}
         print(person)
         dbc.create(PEOPLE_COLLECT, person)
-    return email
+        return email
 
 
 def main():

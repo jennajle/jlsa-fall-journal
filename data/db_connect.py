@@ -93,3 +93,14 @@ def fetch_all_as_dict(key, collection, db=SE_DB):
     for doc in client[db][collection].find():
         del doc[MONGO_ID]
     return ret
+
+
+def convert_mongo_id(doc: dict):
+    if MONGO_ID in doc:
+        doc[MONGO_ID] = str(doc[MONGO_ID])
+
+
+def read_one(collection, filt, db=SE_DB):
+    for doc in client[db][collection].find(filt):
+        convert_mongo_id(doc)
+        return doc

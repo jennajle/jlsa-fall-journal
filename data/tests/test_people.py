@@ -23,7 +23,7 @@ TEMP_PERSON_RECORD = {
 
 @pytest.fixture(scope='function')
 def temp_person():
-    email = ppl.create_person(TEMP_PERSON_RECORD)
+    email = ppl.create('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
     yield email
     try:
         ppl.delete(email)
@@ -58,14 +58,14 @@ def test_create_mh_rec(mock_read_one):
         assert field in mh_rec
 
 
-# def test_has_role(temp_person):
-#     person_rec = ppl.read_one(temp_person)
-#     assert ppl.has_role(person_rec, TEST_ROLE_CODE)
+def test_has_role(temp_person):
+    person_rec = ppl.read_one(temp_person)
+    assert ppl.has_role(person_rec, TEST_ROLE_CODE)
 
 
-# def test_doesnt_have_role(temp_person):
-#     person_rec = ppl.read_one(temp_person)
-#     assert not ppl.has_role(person_rec, 'Not a good role!')
+def test_doesnt_have_role(temp_person):
+    person_rec = ppl.read_one(temp_person)
+    assert not ppl.has_role(person_rec, 'Not a good role!')
 
 
 def test_is_valid_email_no_at():
