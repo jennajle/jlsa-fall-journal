@@ -115,7 +115,7 @@ def create_person(form_data):
     return people[new_id][EMAIL]
 
 
-def update_person(form_data):
+def update(name: str, affiliation: str, email: str, roles: list):
     if not exists(email):
         raise ValueError(f'Updating non-existent person: {email=}')
     if is_valid_person(name, affiliation, email, roles=roles):
