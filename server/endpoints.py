@@ -2,7 +2,7 @@
 This is the file containing all of the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
-# from http import HTTPStatus
+from http import HTTPStatus
 
 from flask import Flask  # , request
 from flask_restx import Resource, Api, fields  # Namespace, fields
@@ -131,26 +131,26 @@ class People(Resource):
         return {'Message': 'Person updated successfully', 'Person': ret}, 201
 
 
-@api.route(f'{PEOPLE_EP}/<_id>')
+@api.route(f'{PEOPLE_EP}/<email>')
 class Person(Resource):
-    def delete(self, _id):
-        """
-        This method deletes a person
-        """
-        ret = ppl.delete_person(_id)
-        return {'Message': 'Person deleted successfully', 'Person': ret}
-
-    def get(self, _id):
+    def get(self, email):
         """
         Retrieve a single person's info
         """
-        person = ppl.read_one(_id)
+        person = ppl.read_one(email)
         if person:
             return person
         else:
-            return {'Message':
-                    'Failed to retrieve person!'
-                    }, 404
+            raise wz.NotFound(f'No such record: {email}')
+
+    @api.response(HTTPStatus.OK, 'Success.')
+    @api.response(HTTPStatus.NOT_FOUND, 'No such person.')
+    def delete(self, email):
+        ret = ppl.delete(email)
+        if ret is not None:
+            return {'Message': 'Person deleted successfully', 'Deleted': ret}, HTTPStatus.OK
+        else:
+            raise wz.NotFound(f'No such person: {email}')
 
 
 MASTHEAD = 'Masthead'

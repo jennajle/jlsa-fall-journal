@@ -81,13 +81,9 @@ def read_one(email: str) -> dict:
     return people_dict.get(email)
 
 
-def delete_person(_id):
-    people = get_people()
-    if _id in people:
-        del people[_id]
-        return _id
-    else:
-        return None
+def delete(email: str):
+    print(f'{EMAIL=}, {email=}')
+    return dbc.delete(PEOPLE_COLLECT, {EMAIL: email})
 
 
 def create_person(form_data):
