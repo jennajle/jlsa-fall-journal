@@ -148,7 +148,10 @@ class Person(Resource):
     def delete(self, email):
         ret = ppl.delete(email)
         if ret is not None:
-            return {'Message': 'Person deleted successfully', 'Deleted': ret}, HTTPStatus.OK
+            return {
+                'Message': 'Person deleted successfully', 
+                'Deleted': ret
+            }, HTTPStatus.OK
         else:
             raise wz.NotFound(f'No such person: {email}')
 
