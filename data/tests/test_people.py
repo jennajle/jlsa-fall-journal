@@ -88,7 +88,7 @@ def test_is_valid_email_domain_too_long():
     assert not ppl.is_valid_email(DOMAIN_TOO_LONG)
 
 
-def test_read():
+def test_read(temp_person):
     people = ppl.read()
     assert isinstance(people, dict)
     assert len(people) > 0
@@ -116,7 +116,7 @@ def test_create(patch_create, patch_read):
     assert ADD_EMAIL in people
 
 
-def test_create_duplicate():
+def test_create_duplicate(temp_person):
     with pytest.raises(ValueError):
         ppl.create('Do not care about name',
                    'Or affiliation', ppl.TEST_EMAIL, TEST_ROLE_CODE)
