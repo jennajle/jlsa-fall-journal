@@ -149,7 +149,7 @@ class Person(Resource):
         ret = ppl.delete(email)
         if ret is not None:
             return {
-                'Message': 'Person deleted successfully', 
+                'Message': 'Person deleted successfully',
                 'Deleted': ret
             }, HTTPStatus.OK
         else:
