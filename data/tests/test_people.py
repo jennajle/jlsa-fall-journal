@@ -121,3 +121,27 @@ def test_create_duplicate(temp_person):
         ppl.create('Do not care about name',
                    'Or affiliation', temp_person,
                    TEST_ROLE_CODE)
+
+
+def test_exists(temp_person):
+    assert ppl.exists(temp_person)
+
+
+def test_doesnt_exist():
+    assert not ppl.exists('Not an existing email!')
+
+
+def test_delete(temp_person):
+    ppl.delete(temp_person)
+    assert not ppl.exists(temp_person)
+
+
+TEST_UPDATE_NAME = 'New Name'
+
+VALID_ROLES = ['ED', 'AU']
+
+
+def test_update_not_there(temp_person):
+    with pytest.raises(ValueError):
+        ppl.update('Will Fail', 'University of the Void',
+                   'Non-existent email', VALID_ROLES)
