@@ -119,5 +119,5 @@ def test_create(patch_create, patch_read):
 def test_create_duplicate(temp_person):
     with pytest.raises(ValueError):
         ppl.create('Do not care about name',
-                   'Or affiliation', ppl.TEST_EMAIL, TEST_ROLE_CODE)
-
+                   'Or affiliation', temp_person,
+                   TEST_ROLE_CODE)
