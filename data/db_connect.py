@@ -22,8 +22,8 @@ def connect_db():
     """
     global client
     if client is None:  # not connected yet!
-        print('Setting client because it is None.')
-        if os.environ.get('CLOUD_MONGO', LOCAL) == CLOUD:
+        print("Setting client because it is None.")
+        if os.environ.get("CLOUD_MONGO", LOCAL) == CLOUD:
             password = os.environ.get("GAME_MONGO_PW")
             if not password:
                 raise ValueError('You must set your password '
@@ -33,7 +33,7 @@ def connect_db():
                                     + '@koukoumongo1.yud9b.mongodb.net/'
                                     + '?retryWrites=true&w=majority')
         else:
-            print('Connecting to Mongo locally.')
+            print("Connecting to Mongo locally.")
             client = pm.MongoClient()
     return client
 
@@ -46,13 +46,15 @@ def create(collection, doc, db=SE_DB):
     return client[db][collection].insert_one(doc)
 
 
-def read_one(collection, filt, db=SE_DB):
+def fetch_one(collection, filt, db=SE_DB):
     """
     Find with a filter and return on the first doc found.
     Return None if not found.
     """
     for doc in client[db][collection].find(filt):
-        convert_mongo_id(doc)
+        if MONGO_ID in doc:
+            # Convert mongo ID to a string so it works as JSON
+            doc[MONGO_ID] = str(doc[MONGO_ID])
         return doc
 
 
@@ -65,7 +67,7 @@ def delete(collection: str, filt: dict, db=SE_DB):
     return del_result.deleted_count
 
 
-def update(collection, filters, update_dict, db=SE_DB):
+def update_doc(collection, filters, update_dict, db=SE_DB):
     return client[db][collection].update_one(filters, {'$set': update_dict})
 
 
@@ -74,8 +76,6 @@ def read(collection, db=SE_DB, no_id=True) -> list:
     for doc in client[db][collection].find():
         if no_id:
             del doc[MONGO_ID]
-        else:
-            convert_mongo_id(doc)
         ret.append(doc)
     return ret
 
