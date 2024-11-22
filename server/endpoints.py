@@ -185,20 +185,29 @@ class RoleManagement(Resource):
         except ValueError as e:
             return {'Message': str(e)}, 400
 
-    def delete(self, _id, role):
+    def delete(self, _id, role=None):
         """
-         This method removes a role from a person.
+         This method removes a specified role from a person,
+         and all roles from a person if not specified.
         """
         person = ppl.read_one(_id)
         if not person:
             raise wz.NotFound(f"Person with email {_id} not found")
 
         try:
-            ppl.remove_role(_id, role)
-            return {
-                'Message': (
-                    f"Role {role} removed successfully "
-                    f"from person with email {_id}")
-            }, 200
+            if role:
+                ppl.remove_role(_id, role)
+                return {
+                    'Message': (
+                        f"Role {role} removed successfully "
+                        f"from person with email {_id}")
+                }, 200
+            else:
+                ppl.clear_roles(_id)
+                return {
+                    'Message': (
+                        f"All roles removed successfully "
+                        f"from person with email {_id}")
+                }, 200
         except ValueError as e:
             return {'Message': str(e)}, 400

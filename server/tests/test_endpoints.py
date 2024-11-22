@@ -51,6 +51,23 @@ def test_create_person():
     assert resp.status_code == 201  # Success
     assert 'Person created successfully' in resp_json['Message']
 
+@patch('data.people.read_one', autospec=True, return_value={
+    'name': 'John Doe',
+    'roles': ['AU'],
+    'affiliation': 'NYU',
+    'email': 'johndoe@nyu.edu'
+})
+@patch('data.people.remove_role', autospec=True)
+def test_delete_role(mock_remove_role, mock_read_one):
+    role = "AU"
+    resp = TEST_CLIENT.delete(f"{ep.PEOPLE_EP}/johndoe@nyu.edu/roles/{role}")
+    resp_json = resp.get_json()
+
+    assert resp.status_code == 200
+    assert f"Role {role} removed successfully" in resp_json['Message']
+
+    mock_remove_role.assert_called_once_with('johndoe@nyu.edu', role)
+
 def test_delete_person():
     existing_person = {
         'name': 'John Doe',
@@ -85,3 +102,5 @@ def test_read_one(mock_read):
 def test_read_one_not_found(mock_read):
     resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/mock_id')
     assert resp.status_code == NOT_FOUND
+
+
