@@ -73,11 +73,13 @@ class Endpoints(Resource):
 @api.route(TITLE_EP)
 class JournalTitle(Resource):
     """
-    This class will give the name of the journal.
+    This class handles creating, reading, updating
+    and deleting the journal title.
     """
     def get(self):
         """
-        The 'get()' method will return the name of the journal.
+        This method provides the title, editor names,
+        and publication date of the journal.
         """
         return {
             TITLE_RESP: TITLE,
@@ -88,9 +90,13 @@ class JournalTitle(Resource):
 
 @api.route(PEOPLE_EP)
 class People(Resource):
+    """
+    This class handles creating, reading, updating
+    and deleting journal people.
+    """
     def get(self):
         """
-        This method lists all persons
+        This method lists all persons.
         """
         return ppl.get_people()
 
@@ -100,7 +106,7 @@ class People(Resource):
     @api.response(400, 'Invalid input or person already exists')
     def post(self):
         """
-        This method creates a person
+        This method creates a new person.
         """
         form_data = request.json
         ret = ppl.create_person(form_data)
@@ -118,7 +124,7 @@ class People(Resource):
     @api.response(400, 'Invalid input or person does not exist')
     def put(self):
         """
-        This method updates an existing person
+        This method updates an existing person.
         """
         form_data = request.json
         ret = ppl.update_person(form_data)
@@ -169,7 +175,7 @@ class Masthead(Resource):
 class RoleManagement(Resource):
     def post(self, _id, role):
         """
-        This method adds a role to a person.
+        This method adds a specific role to a person.
         """
         person = ppl.read_one(_id)
         if not person:

@@ -72,6 +72,9 @@ def update(collection, filters, update_dict, db=SE_DB):
 
 
 def read(collection, db=SE_DB, no_id=True) -> list:
+    """
+    Return a list from the db.
+    """
     ret = []
     for doc in client[db][collection].find():
         if no_id:
