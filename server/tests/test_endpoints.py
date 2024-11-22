@@ -3,7 +3,7 @@ from http.client import (
     FORBIDDEN,
     NOT_ACCEPTABLE,
     NOT_FOUND,
-    OK,
+    OK, # 200
     SERVICE_UNAVAILABLE,
 )
 
@@ -50,6 +50,25 @@ def test_create_person():
     resp_json = resp.get_json()
     assert resp.status_code == 201  # Success
     assert 'Person created successfully' in resp_json['Message']
+
+
+@patch('data.people.read_one',  autospec=True, return_value={
+    'name': 'John Doe',
+    'roles': ['AU'],
+    'affiliation': 'NYU',
+    'email': 'johndoe@nyu.edu'
+})
+@patch('data.people.add_role',  autospec=True)
+def test_add_role(mock_add_role, mock_read_one):
+    _id = "johndoe@nyu.edu"
+    role = "Editor"
+
+    resp = TEST_CLIENT.post(f"{ep.PEOPLE_EP}/{_id}/roles/{role}")
+    assert resp.status_code == OK
+
+    mock_read_one.assert_called_once_with(_id)
+    mock_add_role.assert_called_once_with(_id, role)
+
 
 @patch('data.people.read_one', autospec=True, return_value={
     'name': 'John Doe',
