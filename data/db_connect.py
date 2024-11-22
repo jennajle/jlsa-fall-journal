@@ -22,13 +22,13 @@ def connect_db():
     """
     global client
     if client is None:  # not connected yet!
-        print("Setting client because it is None.")
-        if os.environ.get("CLOUD_MONGO", LOCAL) == CLOUD:
+        print('Setting client because it is None.')
+        if os.environ.get('CLOUD_MONGO', LOCAL) == CLOUD:
             password = os.environ.get("GAME_MONGO_PW")
             if not password:
                 raise ValueError('You must set your password '
                                  + 'to use Mongo in the cloud.')
-            print("Connecting to Mongo in the cloud.")
+            print('Connecting to Mongo in the cloud.')
             client = pm.MongoClient(f'mongodb+srv://gcallah:{password}'
                                     + '@koukoumongo1.yud9b.mongodb.net/'
                                     + '?retryWrites=true&w=majority')
@@ -67,7 +67,7 @@ def delete(collection: str, filt: dict, db=SE_DB):
     return del_result.deleted_count
 
 
-def update_doc(collection, filters, update_dict, db=SE_DB):
+def update(collection, filters, update_dict, db=SE_DB):
     return client[db][collection].update_one(filters, {'$set': update_dict})
 
 
@@ -76,6 +76,8 @@ def read(collection, db=SE_DB, no_id=True) -> list:
     for doc in client[db][collection].find():
         if no_id:
             del doc[MONGO_ID]
+        else:
+            convert_mongo_id(doc)
         ret.append(doc)
     return ret
 
