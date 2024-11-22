@@ -49,3 +49,19 @@ def test_remove_role(mock_read_one):
     mock_read_one.return_value = mock_person
     ppl.remove_role(test_email, test_role)
     assert test_role not in mock_person["roles"]
+
+
+@patch("data.people.read_one", autospec=True)
+def test_clear_roles(mock_read_one):
+    test_email = "bob@nyu.edu"
+    test_roles = ["AU", "ED", "CE"]
+    mock_person = {
+        "name": "Bob",
+        "email": test_email,
+        "roles": test_roles,
+        "affiliation": "NYU"
+    }
+
+    mock_read_one.return_value = mock_person
+    ppl.clear_roles(test_email)
+    assert all([role not in mock_person["roles"] for role in rls.get_roles()])
