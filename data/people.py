@@ -210,6 +210,21 @@ def create(name: str, affiliation: str, email: str, role: str):
         return email
 
 
+def bulk_delete(emails: list):
+    """
+    Delete multiple records from the database given a list of emails.
+    """
+    deleted_count = 0
+    for email in emails:
+        if exists(email):
+            delete(email)
+            deleted_count += 1
+            print(f"Deleted: {email}")
+        else:
+            print(f"Email not found, cannot delete: {email}")
+    return deleted_count
+
+
 def main():
     print(get_masthead())
 
