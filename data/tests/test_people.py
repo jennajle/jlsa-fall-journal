@@ -101,19 +101,9 @@ ADD_EMAIL = 'joe@nyu.edu'
 @patch('data.people.read')
 @patch('data.people.create', autospec=True)
 def test_create(patch_create, patch_read):
-    patch_create.return_value = ADD_EMAIL
-    patch_read.return_value = {}
-
-    people = ppl.read()
-    assert ADD_EMAIL not in people
     ppl.create('Joe Smith', 'NYU', ADD_EMAIL, TEST_ROLE_CODE)
-    patch_read.return_value = {ADD_EMAIL: {'name': 'Joe Smith',
-                                           'affiliation': 'NYU',
-                                           'email': ADD_EMAIL,
-                                           'roles': [TEST_ROLE_CODE]}}
-
-    people = ppl.read()
-    assert ADD_EMAIL in people
+    assert ppl.exists(ADD_EMAIL)
+    ppl.delete(ADD_EMAIL)
 
 
 def test_create_duplicate(temp_person):
