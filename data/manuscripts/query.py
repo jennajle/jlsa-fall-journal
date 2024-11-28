@@ -61,3 +61,19 @@ def handle_action(curr_state, action) -> str:
         elif action == REJECT:
             new_state = REJECTED
     return new_state
+
+
+def get_next_possible_actions(curr_state: str) -> list:
+    """
+    Returns a list of possible actions based on the current state.
+    """
+    if not is_valid_state(curr_state):
+        raise ValueError(f'Invalid state: {curr_state}')
+    possible_actions = []
+    if curr_state == SUBMITTED:
+        possible_actions = [ASSIGN_REF, REJECT]
+    elif curr_state == IN_REF_REV:
+        possible_actions = [ACCEPT, REJECT]
+    elif curr_state == COPY_EDIT:
+        possible_actions = [DONE]
+    return possible_actions

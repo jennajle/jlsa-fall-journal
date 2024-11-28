@@ -55,3 +55,16 @@ def test_handle_action_valid_return():
         for action in mqry.get_actions():
             new_state = mqry.handle_action(state, action)
             assert mqry.is_valid_state(new_state)
+
+
+def test_get_next_possible_actions():
+    for state in mqry.get_states():
+        possible_actions = mqry.get_next_possible_actions(state)
+        for action in possible_actions:
+            assert mqry.is_valid_action(action)
+        # Ensure the function does not return invalid actions
+        for action in mqry.get_actions():
+            if action not in possible_actions:
+                assert not (state == mqry.SUBMITTED and action in [mqry.ACCEPT, mqry.DONE])
+                assert not (state == mqry.IN_REF_REV and action == mqry.DONE)
+                assert not (state == mqry.COPY_EDIT and action in [mqry.ACCEPT, mqry.REJECT])
