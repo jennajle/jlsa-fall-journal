@@ -34,6 +34,9 @@ def temp_person():
 def test_read_one(temp_person):
     assert ppl.read_one(temp_person) is not None
 
+def test_read_one_not_there():
+    assert ppl.read_one('Not an existing email!') is None
+
 @pytest.mark.skip(reason="Skip for high performance reasons")
 def test_get_masthead():
     mh = ppl.get_masthead()
