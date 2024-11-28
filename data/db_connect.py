@@ -52,9 +52,8 @@ def fetch_one(collection, filt, db=SE_DB):
     Return None if not found.
     """
     for doc in client[db][collection].find(filt):
-        if MONGO_ID in doc:
-            # Convert mongo ID to a string so it works as JSON
-            doc[MONGO_ID] = str(doc[MONGO_ID])
+        convert_mongo_id(doc)
+
         return doc
 
 
