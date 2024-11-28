@@ -4,6 +4,8 @@ import pytest
 
 import data.manuscripts.query as mqry
 
+from unittest.mock import patch
+
 
 def gen_random_not_valid_str() -> str:
     """
@@ -55,3 +57,10 @@ def test_handle_action_valid_return():
         for action in mqry.get_actions():
             new_state = mqry.handle_action(state, action)
             assert mqry.is_valid_state(new_state)
+
+
+def test_handle_action_with_patch():
+    with patch('data.manuscripts.query.handle_action', return_value=mqry.COPY_EDIT) as mock_handle_action:
+        result = mqry.handle_action(mqry.IN_REF_REV, mqry.ACCEPT)
+        mock_handle_action.assert_called_once_with(mqry.IN_REF_REV, mqry.ACCEPT)
+        assert result == mqry.COPY_EDIT
