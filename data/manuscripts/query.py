@@ -61,3 +61,10 @@ def handle_action(curr_state, action) -> str:
         elif action == REJECT:
             new_state = REJECTED
     return new_state
+
+
+def test_handle_action_with_patch():
+    with patch('data.manuscripts.query.handle_action', return_value=mqry.COPY_EDIT) as mock_handle_action:
+        result = mqry.handle_action(mqry.IN_REF_REV, mqry.ACCEPT)
+        mock_handle_action.assert_called_once_with(mqry.IN_REF_REV, mqry.ACCEPT)
+        assert result == mqry.COPY_EDIT
