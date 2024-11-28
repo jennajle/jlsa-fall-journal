@@ -49,7 +49,7 @@ def is_valid_email(email: str) -> bool:
 
 def is_valid_person(name: str, affiliation: str,
                     email: str,
-                    role: str, roles: list = None) -> bool:
+                    role: str = None, roles: list = None) -> bool:
     if not is_valid_email(email):
         raise ValueError(f'Invalid email: {email}')
     if role:
