@@ -231,7 +231,8 @@ class RolePeople(Resource):
 
         people = []
         for person in ppl.read().values():
-            if role in person[rls.ROLES]:
+            roles = person.get('roles', [])
+            if role in roles:
                 people.append(person)
 
         if not people:

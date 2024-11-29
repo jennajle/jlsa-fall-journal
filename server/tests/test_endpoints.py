@@ -1,5 +1,5 @@
 from http.client import (
-    BAD_REQUEST,
+    BAD_REQUEST, # 400
     FORBIDDEN,
     NOT_ACCEPTABLE,
     NOT_FOUND,
@@ -121,5 +121,29 @@ def test_read_one(mock_read):
 def test_read_one_not_found(mock_read):
     resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/mock_id')
     assert resp.status_code == NOT_FOUND
+
+
+@patch('data.people.read', autospec=True, return_value={
+    'joshsmith@nyu.edu': {
+        'name': 'Josh Smith',
+        'roles': ['AU'],
+        'affiliation': 'NYU',
+        'email': 'joshsmith@nyu.edu'
+    },
+    'stellaadams@nyu.edu': {
+        'name': 'Stella Adams',
+        'roles': ['AU'],
+        'affiliation': 'NYU',
+        'email': 'stellaadams@nyu.edu'
+    }
+})
+@patch('data.roles.is_valid', autospec=True, return_value=True)
+def test_get_people_with_specific_role(mock_is_valid, mock_read):
+    resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/roles/AU')
+    resp_json = resp.get_json()
+    assert resp.status_code == 200
+    assert 'AU' in resp_json
+    assert len(resp_json['AU']) == 2
+
 
 
