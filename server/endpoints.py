@@ -8,6 +8,7 @@ from flask import Flask  # , request
 from flask_restx import Resource, Api, fields  # Namespace, fields
 from flask_cors import CORS
 import werkzeug.exceptions as wz
+import data.roles as rls
 
 from flask import request
 
@@ -217,3 +218,23 @@ class RoleManagement(Resource):
                 }, 200
         except ValueError as e:
             return {'Message': str(e)}, 400
+
+
+@api.route(f'{PEOPLE_EP}/roles/<role>')
+class RolePeople(Resource):
+    def get(self, role):
+        """
+        This method retrieves all people with a specific role
+        """
+        if not rls.is_valid(role):
+            return {'Message': f'Invalid role: {role}'}, 400
+
+        people = []
+        for person in ppl.read().values():
+            if role in person[rls.ROLES]:
+                people.append(person)
+
+        if not people:
+            return {
+                'Message': f'No people found with role: {role}'}, 404
+        return {role: people}, 200
