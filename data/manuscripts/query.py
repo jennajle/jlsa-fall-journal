@@ -35,6 +35,7 @@ VALID_ACTIONS = [
     REJECT,
 ]
 
+# can redefine and append more valid actions later on
 VALID_ACTIONS_FOR_STATE = {
     'SUB': ['ARF', 'REJ'],
     'REV': ['ACC', 'REJ'],
@@ -56,6 +57,9 @@ def handle_action(curr_state, action) -> str:
         raise ValueError(f'Invalid state: {curr_state}')
     if not is_valid_action(action):
         raise ValueError(f'Invalid action: {action}')
+    if action not in VALID_ACTIONS_FOR_STATE[curr_state]:
+        return curr_state
+
     new_state = curr_state
     if curr_state == SUBMITTED:
         if action == ASSIGN_REF:

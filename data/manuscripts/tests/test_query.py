@@ -23,7 +23,6 @@ def test_is_valid_state(state):
     assert mqry.is_valid_state(state)
 
 
-
 def test_is_not_valid_state():
     # run this test "a few" times
     for i in range(10):
@@ -77,3 +76,34 @@ def test_handle_action_with_patch():
         result = mqry.handle_action(mqry.IN_REF_REV, mqry.ACCEPT)
         mock_handle_action.assert_called_once_with(mqry.IN_REF_REV, mqry.ACCEPT)
         assert result == mqry.COPY_EDIT
+
+
+@pytest.mark.parametrize(
+    "curr_state, action, expected_state",
+    [
+        (mqry.SUBMITTED, mqry.ASSIGN_REF, mqry.IN_REF_REV),
+        (mqry.SUBMITTED, mqry.REJECT, mqry.REJECTED),
+        (mqry.IN_REF_REV, mqry.ACCEPT, mqry.COPY_EDIT),
+        (mqry.IN_REF_REV, mqry.REJECT, mqry.REJECTED),
+    ],
+)
+def test_handle_action_valid_transitions(curr_state, action, expected_state):
+    assert mqry.handle_action(curr_state, action) == expected_state
+
+
+def test_invalid_transitions():
+    invalid_combinations = [
+        (mqry.COPY_EDIT, mqry.ASSIGN_REF),
+        (mqry.REJECTED, mqry.ACCEPT),
+        (mqry.IN_REF_REV, mqry.DONE),
+    ]
+    for state, action in invalid_combinations:
+        new_state = mqry.handle_action(state, action)
+        assert state == new_state
+
+
+def test_performance_large_inputs():
+    states = [mqry.SUBMITTED for _ in range(10_000)]
+    actions = [mqry.ASSIGN_REF for _ in range(10_000)]
+    for state, action in zip(states, actions):
+        assert mqry.handle_action(state, action) == mqry.IN_REF_REV
