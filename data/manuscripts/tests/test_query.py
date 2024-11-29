@@ -18,9 +18,10 @@ def gen_random_not_valid_str() -> str:
     bad_str = str(big_int)
 
 
-def test_is_valid_state():
-    for state in mqry.get_states():
-        assert mqry.is_valid_state(state)
+@pytest.mark.parametrize("state", mqry.get_states())
+def test_is_valid_state(state):
+    assert mqry.is_valid_state(state)
+
 
 
 def test_is_not_valid_state():
@@ -58,6 +59,18 @@ def test_handle_action_valid_return():
             new_state = mqry.handle_action(state, action)
             assert mqry.is_valid_state(new_state)
 
+
+def test_handle_action_empty_inputs():
+    with pytest.raises(ValueError):
+        mqry.handle_action("", mqry.TEST_ACTION)
+    with pytest.raises(ValueError):
+        mqry.handle_action(mqry.TEST_STATE, "")
+
+def test_handle_action_no_state_change():
+    for state in mqry.get_states():
+        invalid_actions = [action for action in mqry.get_actions() if action not in mqry.VALID_ACTIONS_FOR_STATE.get(state, [])]
+        for action in invalid_actions:
+            assert mqry.handle_action(state, action) == state
 
 def test_handle_action_with_patch():
     with patch('data.manuscripts.query.handle_action', return_value=mqry.COPY_EDIT) as mock_handle_action:
