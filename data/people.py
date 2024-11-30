@@ -94,7 +94,8 @@ def create_person(form_data):
     email = form_data.get('email')
     new_id = email
     name = form_data.get('name')
-    person_roles = form_data.get('roles', [])
+    # affiliation = form_data.get('affiliation')
+    role = form_data.get('role')
 
     if email in TEST_PERSON_DICT:
         print("Person already exists")
@@ -102,13 +103,12 @@ def create_person(form_data):
     elif not is_valid_email(email):
         raise ValueError("Invalid Email:", email)
 
-    for role in person_roles:
-        if not rls.is_valid(role):
-            raise ValueError("Bad Role:", role)
+    if not rls.is_valid(role):
+        raise ValueError("Bad Role:", role)
 
     people[new_id] = {
         NAME: name,
-        ROLES: person_roles,
+        ROLES: [role],
         AFFILIATION: form_data.get('affiliation', ''),
         EMAIL: email,
     }

@@ -21,8 +21,8 @@ api = Api(app)
 person_model = api.model('Person', {
     'name': fields.String(required=True, description='The person\'s name',
                           min_length=2),
-    'roles': fields.List(fields.String, description='The roles of the person',
-                         default=[]),
+    'role': fields.String(description='The roles of the person',
+                         default=''),
     'affiliation': fields.String(description='The affiliation of the person',
                                  default=''),
     'email': fields.String(required=True,

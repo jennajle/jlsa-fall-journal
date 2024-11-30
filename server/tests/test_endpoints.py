@@ -41,7 +41,7 @@ def test_get_people():
 def test_create_person():
     valid_person_data = {
         'name': 'John Doe',
-        'roles': ['AU'],
+        'role': 'AU',
         'affiliation': 'NYU',
         'email': 'johndoe@nyu.edu'
     }
