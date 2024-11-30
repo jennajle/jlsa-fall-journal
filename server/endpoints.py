@@ -99,7 +99,7 @@ class People(Resource):
         """
         This method lists all persons.
         """
-        return ppl.get_people()
+        return ppl.read()
 
     @api.doc('create_person')
     @api.expect(person_model)

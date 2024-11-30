@@ -90,29 +90,24 @@ def delete(email: str):
 
 
 def create_person(form_data):
-    people = get_people()
+    # people = get_people()
     email = form_data.get('email')
-    new_id = email
+    # new_id = email
     name = form_data.get('name')
-    # affiliation = form_data.get('affiliation')
+    affiliation = form_data.get('affiliation')
     role = form_data.get('role')
 
-    if email in TEST_PERSON_DICT:
-        print("Person already exists")
-        return None
-    elif not is_valid_email(email):
-        raise ValueError("Invalid Email:", email)
-
-    if not rls.is_valid(role):
-        raise ValueError("Bad Role:", role)
-
-    people[new_id] = {
-        NAME: name,
-        ROLES: [role],
-        AFFILIATION: form_data.get('affiliation', ''),
-        EMAIL: email,
-    }
-    return people[new_id][EMAIL]
+    if exists(email):
+        raise ValueError(f'Adding duplicate {email=}')
+    if is_valid_person(name, affiliation, email, role=role):
+        roles = []
+        if role:
+            roles.append(role)
+        person = {NAME: name, AFFILIATION: affiliation,
+                  EMAIL: email, ROLES: roles}
+        print(person)
+        dbc.create(PEOPLE_COLLECT, person)
+        return email
 
 
 def update(name: str, affiliation: str, email: str, roles: list):
