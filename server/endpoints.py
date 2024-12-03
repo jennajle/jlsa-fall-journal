@@ -29,6 +29,17 @@ person_model = api.model('Person', {
                            description='The email of the person'),
 })
 
+multi_role_person_model = api.model('MultiRolePerson', {
+    'name': fields.String(required=True, description='The person\'s name',
+                          min_length=2),
+    'roles': fields.List(fields.String, description='The roles of the person',
+                         default=[]),
+    'affiliation': fields.String(description='The affiliation of the person',
+                                 default=''),
+    'email': fields.String(required=True,
+                           description='The email of the person'),
+})
+
 ENDPOINT_EP = '/endpoints'
 ENDPOINT_RESP = 'Available endpoints'
 HELLO_EP = '/hello'
@@ -110,7 +121,11 @@ class People(Resource):
         This method creates a new person.
         """
         form_data = request.json
-        ret = ppl.create_person(form_data)
+        name = form_data.get('name')
+        affiliation = form_data.get('affiliation')
+        email = form_data.get('email')
+        role = form_data.get('role')
+        ret = ppl.create_person(name, affiliation, email, role)
         if ret is None:
             return {'Message':
                     'Failed to create person, ' +
@@ -120,7 +135,7 @@ class People(Resource):
         return {'Message': 'Person created successfully', 'Person': ret}, 201
 
     @api.doc('update_person')
-    @api.expect(person_model)
+    @api.expect(multi_role_person_model)
     @api.response(201, 'Person created successfully')
     @api.response(400, 'Invalid input or person does not exist')
     def put(self):
@@ -128,7 +143,11 @@ class People(Resource):
         This method updates an existing person.
         """
         form_data = request.json
-        ret = ppl.update_person(form_data)
+        name = form_data.get('name')
+        affiliation = form_data.get('affiliation')
+        email = form_data.get('email')
+        roles = form_data.get('roles')
+        ret = ppl.update(name, affiliation, email, roles)
         if ret is None:
             return {'Message':
                     'Failed to create person, ' +

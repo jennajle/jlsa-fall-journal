@@ -62,10 +62,6 @@ def is_valid_person(name: str, affiliation: str,
     return True
 
 
-def get_people():
-    return people_dict
-
-
 def read() -> dict:
     people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
     print(f'{people=}')
@@ -89,14 +85,7 @@ def delete(email: str):
     return dbc.delete(PEOPLE_COLLECT, {EMAIL: email})
 
 
-def create_person(form_data):
-    # people = get_people()
-    email = form_data.get('email')
-    # new_id = email
-    name = form_data.get('name')
-    affiliation = form_data.get('affiliation')
-    role = form_data.get('role')
-
+def create_person(name: str, affiliation: str, email: str, role: str):
     if exists(email):
         raise ValueError(f'Adding duplicate {email=}')
     if is_valid_person(name, affiliation, email, role=role):
