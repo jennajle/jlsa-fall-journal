@@ -93,6 +93,13 @@ STATE_TABLE = {
 }
 
 
+
+def get_valid_actions_by_state(state: str):
+    valid_actions = STATE_TABLE[state].keys()
+    print(f'{valid_actions=}')
+    return valid_actions
+
+
 def handle_action(curr_state, action, manuscript) -> str:
     if curr_state not in STATE_TABLE:
         raise ValueError(f'Bad state: {curr_state}')
