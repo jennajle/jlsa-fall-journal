@@ -113,3 +113,24 @@ def test_performance_large_inputs():
     actions = [mqry.ASSIGN_REF for _ in range(10_000)]
     for state, action in zip(states, actions):
         assert mqry.handle_action(state, action, mqry.SAMPLE_MANU) == mqry.IN_REF_REV
+
+
+@pytest.mark.parametrize(
+    "state, expected_actions",
+    [
+        (mqry.SUBMITTED, ["ARF", "REJ"]),
+        (mqry.IN_REF_REV, []),
+        (mqry.COPY_EDIT, ["DON"]),
+    ],
+)
+def test_get_valid_actions_by_state(state, expected_actions):
+    assert list(mqry.get_valid_actions_by_state(state)) == expected_actions
+
+
+def test_handle_action_with_mocked_manuscript():
+    """
+    Mock to make sure transitions only
+    depend on curr_state and action
+    """
+    manuscript_mock = {"title": "Mock Title", "author": "Mock Author"}
+    assert mqry.handle_action(mqry.SUBMITTED, mqry.ASSIGN_REF, manuscript_mock) == mqry.IN_REF_REV
