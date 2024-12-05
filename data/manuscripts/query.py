@@ -18,7 +18,7 @@ VALID_STATES = [
 
 SAMPLE_MANU = {
     flds.TITLE: 'Short module import names in Python',
-    flds.AUTHOR: '',
+    flds.AUTHOR: 'jlsa',
     flds.REFEREES: [],
 }
 
@@ -90,3 +90,20 @@ STATE_TABLE = {
     REJECTED: {
     },
 }
+
+
+def handle_action(curr_state, action, manuscript) -> str:
+    if curr_state not in STATE_TABLE:
+        raise ValueError(f'Bad state: {curr_state}')
+    if action not in STATE_TABLE[curr_state]:
+        raise ValueError(f'{action} not available in {curr_state}')
+    return STATE_TABLE[curr_state][action][FUNC](manuscript)
+
+
+def main():
+    print(handle_action(SUBMITTED, ASSIGN_REF, SAMPLE_MANU))
+    print(handle_action(SUBMITTED, REJECT, SAMPLE_MANU))
+
+
+if __name__ == '__main__':
+    main()
