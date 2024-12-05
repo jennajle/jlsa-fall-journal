@@ -1,5 +1,6 @@
 import data.manuscripts.fields as flds
 
+AUTHOR_REV = 'AUR'
 COPY_EDIT = 'CED'
 IN_REF_REV = 'REV'
 REJECTED = 'REJ'
