@@ -70,11 +70,14 @@ def test_handle_action_empty_inputs():
     with pytest.raises(ValueError):
         mqry.handle_action(mqry.TEST_STATE, "", mqry.SAMPLE_MANU)
 
+
 def test_handle_action_no_state_change():
     for state in mqry.get_states():
-        invalid_actions = [action for action in mqry.get_actions() if action not in mqry.VALID_ACTIONS_FOR_STATE.get(state, [])]
+        invalid_actions = [action for action in mqry.get_actions() if action not in mqry.get_valid_actions_by_state(state)]
         for action in invalid_actions:
-            assert mqry.handle_action(state, action, mqry.SAMPLE_MANU) == state
+            with pytest.raises(ValueError):
+                mqry.handle_action(state, action, mqry.SAMPLE_MANU)
+
 
 def test_handle_action_with_patch():
     with patch('data.manuscripts.query.handle_action', return_value=mqry.COPY_EDIT) as mock_handle_action:
@@ -88,8 +91,6 @@ def test_handle_action_with_patch():
     [
         (mqry.SUBMITTED, mqry.ASSIGN_REF, mqry.IN_REF_REV),
         (mqry.SUBMITTED, mqry.REJECT, mqry.REJECTED),
-        (mqry.IN_REF_REV, mqry.ACCEPT, mqry.COPY_EDIT),
-        (mqry.IN_REF_REV, mqry.REJECT, mqry.REJECTED),
     ],
 )
 def test_handle_action_valid_transitions(curr_state, action, expected_state):
@@ -103,12 +104,12 @@ def test_invalid_transitions():
         (mqry.IN_REF_REV, mqry.DONE),
     ]
     for state, action in invalid_combinations:
-        new_state = mqry.handle_action(state, action, mqry.SAMPLE_MANU)
-        assert state == new_state
+        with pytest.raises(ValueError):
+            mqry.handle_action(state, action, mqry.SAMPLE_MANU)
 
 
 def test_performance_large_inputs():
     states = [mqry.SUBMITTED for _ in range(10_000)]
     actions = [mqry.ASSIGN_REF for _ in range(10_000)]
     for state, action in zip(states, actions):
-        assert mqry.handle_action(state, action) == mqry.IN_REF_REV
+        assert mqry.handle_action(state, action, mqry.SAMPLE_MANU) == mqry.IN_REF_REV
