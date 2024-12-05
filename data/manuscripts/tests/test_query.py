@@ -66,15 +66,15 @@ def test_handle_action_valid_return():
 
 def test_handle_action_empty_inputs():
     with pytest.raises(ValueError):
-        mqry.handle_action("", mqry.TEST_ACTION, mqry.SAMPLE_MANU)
+        mqry.handle_action("", mqry.TEST_ACTION)
     with pytest.raises(ValueError):
-        mqry.handle_action(mqry.TEST_STATE, "", mqry.SAMPLE_MANU)
+        mqry.handle_action(mqry.TEST_STATE, "")
 
 def test_handle_action_no_state_change():
     for state in mqry.get_states():
         invalid_actions = [action for action in mqry.get_actions() if action not in mqry.VALID_ACTIONS_FOR_STATE.get(state, [])]
         for action in invalid_actions:
-            assert mqry.handle_action(state, action, mqry.SAMPLE_MANU) == state
+            assert mqry.handle_action(state, action) == state
 
 def test_handle_action_with_patch():
     with patch('data.manuscripts.query.handle_action', return_value=mqry.COPY_EDIT) as mock_handle_action:
@@ -93,7 +93,7 @@ def test_handle_action_with_patch():
     ],
 )
 def test_handle_action_valid_transitions(curr_state, action, expected_state):
-    assert mqry.handle_action(curr_state, action, mqry.SAMPLE_MANU) == expected_state
+    assert mqry.handle_action(curr_state, action) == expected_state
 
 
 def test_invalid_transitions():
@@ -103,7 +103,7 @@ def test_invalid_transitions():
         (mqry.IN_REF_REV, mqry.DONE),
     ]
     for state, action in invalid_combinations:
-        new_state = mqry.handle_action(state, action, mqry.SAMPLE_MANU)
+        new_state = mqry.handle_action(state, action)
         assert state == new_state
 
 
