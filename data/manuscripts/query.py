@@ -21,6 +21,7 @@ SAMPLE_MANU = {
     flds.TITLE: 'Short module import names in Python',
     flds.AUTHOR: 'jlsa',
     flds.REFEREES: [],
+    'history': [] # track what states the manuscript went through
 }
 
 
@@ -106,6 +107,15 @@ def handle_action(curr_state, action, manuscript) -> str:
     if action not in STATE_TABLE[curr_state]:
         raise ValueError(f'{action} not available in {curr_state}')
     return STATE_TABLE[curr_state][action][FUNC](manuscript)
+
+
+def add_to_history(manuscript: dict, curr_state: str, action: str, new_state: str):
+    history = manuscript.setdefault('history', [])
+    history.append({
+        'from': curr_state,
+        'action': action,
+        'to': new_state,
+    })
 
 
 def main():
