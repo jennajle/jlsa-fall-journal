@@ -54,3 +54,12 @@ def test_validate_field_data_valid():
         mflds.REFEREES: ["Ron", "Hermione"]
     }
     assert mflds.validate_field_data(valid_data) is True
+
+
+def test_validate_field_data_invalid():
+    invalid_data = {
+        mflds.TITLE: "The Great Gatsby",
+        "invalid_field": "random"
+    }
+    with pytest.raises(ValueError):
+        mflds.validate_field_data(invalid_data)
