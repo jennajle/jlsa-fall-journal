@@ -146,4 +146,12 @@ def test_get_people_with_specific_role(mock_is_valid, mock_read):
     assert len(resp_json['AU']) == 2
 
 
+@patch('data.roles.is_valid', autospec=True, return_value=False)
+def test_get_people_with_invalid_role(mock_is_valid):
+    resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/roles/INVALID_ROLE')
+    resp_json = resp.get_json()
+    assert resp.status_code == 400 # BAD_REQUEST
+    assert 'Invalid role' in resp_json['Message']
+
+
 
