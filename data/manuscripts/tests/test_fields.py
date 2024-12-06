@@ -2,6 +2,12 @@ import data.manuscripts.fields as mflds
 
 import pytest
 
+mflds.FIELDS = {
+    mflds.TITLE: {mflds.DISP_NAME: "Title"},
+    mflds.AUTHOR: {mflds.DISP_NAME: "Author"},
+    mflds.REFEREES: {mflds.DISP_NAME: "Referees"},
+}
+
 
 def test_get_flds():
     assert isinstance(mflds.get_flds(), dict)
@@ -39,3 +45,12 @@ def test_empty_fields():
 ])
 def test_get_disp_name_parametrized(fld_name, expected_disp_name):
     assert mflds.get_disp_name(fld_name) == expected_disp_name
+
+
+def test_validate_field_data_valid():
+    valid_data = {
+        mflds.TITLE: "Harry Potter Philosopher's Stone",
+        mflds.AUTHOR: "Harry",
+        mflds.REFEREES: ["Ron", "Hermione"]
+    }
+    assert mflds.validate_field_data(valid_data) is True
