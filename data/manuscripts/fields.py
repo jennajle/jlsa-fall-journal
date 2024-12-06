@@ -27,6 +27,13 @@ def get_disp_name(fld_nm: str) -> dict:
     return fld[DISP_NAME]
 
 
+def validate_field_data(field_data: dict) -> bool:
+    for field in field_data:
+        if field not in FIELDS:
+            raise ValueError(f"Unknown field: {field}")
+    return True
+
+
 def main():
     print(f'{get_flds()=}')
 
