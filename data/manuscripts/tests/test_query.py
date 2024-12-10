@@ -44,14 +44,14 @@ def test_handle_action_bad_state():
     with pytest.raises(ValueError):
         mqry.handle_action(gen_random_not_valid_str(),
                            mqry.TEST_ACTION,
-                           mqry.SAMPLE_MANU)
+                           manu=mqry.SAMPLE_MANU)
 
 
 def test_handle_action_bad_action():
     with pytest.raises(ValueError):
         mqry.handle_action(mqry.TEST_STATE,
                            gen_random_not_valid_str(),
-                           mqry.SAMPLE_MANU)
+                           manu=mqry.SAMPLE_MANU)
 
 
 def test_handle_action_valid_return():
@@ -59,16 +59,21 @@ def test_handle_action_valid_return():
         for action in mqry.get_valid_actions_by_state(state):
             print(f'{action=}')
             new_state = mqry.handle_action(state, action,
-                                           mqry.SAMPLE_MANU)
+                                           manu=mqry.SAMPLE_MANU,
+                                           ref='Some ref')
             print(f'{new_state=}')
             assert mqry.is_valid_state(new_state)
 
 
 def test_handle_action_empty_inputs():
     with pytest.raises(ValueError):
-        mqry.handle_action("", mqry.TEST_ACTION, mqry.SAMPLE_MANU)
+        mqry.handle_action(curr_state="",
+                           action=mqry.TEST_ACTION,
+                           manu=mqry.SAMPLE_MANU)
     with pytest.raises(ValueError):
-        mqry.handle_action(mqry.TEST_STATE, "", mqry.SAMPLE_MANU)
+        mqry.handle_action(curr_state=mqry.TEST_STATE,
+                           action="",
+                           manu=mqry.SAMPLE_MANU)
 
 
 def test_handle_action_no_state_change():
@@ -76,7 +81,9 @@ def test_handle_action_no_state_change():
         invalid_actions = [action for action in mqry.get_actions() if action not in mqry.get_valid_actions_by_state(state)]
         for action in invalid_actions:
             with pytest.raises(ValueError):
-                mqry.handle_action(state, action, mqry.SAMPLE_MANU)
+                mqry.handle_action(curr_state=state,
+                                   action=action,
+                                   manu=mqry.SAMPLE_MANU)
 
 
 def test_handle_action_with_patch():
@@ -94,7 +101,10 @@ def test_handle_action_with_patch():
     ],
 )
 def test_handle_action_valid_transitions(curr_state, action, expected_state):
-    assert mqry.handle_action(curr_state, action, mqry.SAMPLE_MANU) == expected_state
+    assert mqry.handle_action(curr_state=curr_state,
+                              action=action,
+                              manu=mqry.SAMPLE_MANU,
+                              ref="Some ref") == expected_state
 
 
 def test_invalid_transitions():
@@ -105,22 +115,28 @@ def test_invalid_transitions():
     ]
     for state, action in invalid_combinations:
         with pytest.raises(ValueError):
-            mqry.handle_action(state, action, mqry.SAMPLE_MANU)
+            mqry.handle_action(curr_state=state,
+                               action=action,
+                               manu=mqry.SAMPLE_MANU)
 
 
 def test_performance_large_inputs():
     states = [mqry.SUBMITTED for _ in range(10_000)]
     actions = [mqry.ASSIGN_REF for _ in range(10_000)]
     for state, action in zip(states, actions):
-        assert mqry.handle_action(state, action, mqry.SAMPLE_MANU) == mqry.IN_REF_REV
+        assert mqry.handle_action(curr_state=state,
+                                  action=action,
+                                  manu=mqry.SAMPLE_MANU,
+                                  ref="Some ref") == mqry.IN_REF_REV
 
 
 @pytest.mark.parametrize(
     "state, expected_actions",
     [
-        (mqry.SUBMITTED, ["ARF", "REJ"]),
-        (mqry.IN_REF_REV, []),
-        (mqry.COPY_EDIT, ["DON"]),
+        ('SUB', ['ARF', 'REJ', 'WIT']),
+        ('REV', ['ARF', 'DRF', 'WIT']),
+        ('CED', ['DON', 'WIT']),
+        ('REJ', ['WIT']),
     ],
 )
 def test_get_valid_actions_by_state(state, expected_actions):
@@ -132,5 +148,12 @@ def test_handle_action_with_mocked_manuscript():
     Mock to make sure transitions only
     depend on curr_state and action
     """
-    manuscript_mock = {"title": "Mock Title", "author": "Mock Author"}
-    assert mqry.handle_action(mqry.SUBMITTED, mqry.ASSIGN_REF, manuscript_mock) == mqry.IN_REF_REV
+    manuscript_mock = {
+        "title": "Mock Title",
+        "author": "Mock Author",
+        "referees": []
+    }
+    assert mqry.handle_action(curr_state=mqry.SUBMITTED,
+                                  action=mqry.ASSIGN_REF,
+                                  manu=manuscript_mock,
+                                  ref="Mock ref") == mqry.IN_REF_REV
