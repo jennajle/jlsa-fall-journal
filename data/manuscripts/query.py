@@ -156,8 +156,12 @@ def add_to_history(manuscript: dict, curr_state: str, action: str, new_state: st
 
 
 def main():
-    print(handle_action(SUBMITTED, ASSIGN_REF, SAMPLE_MANU))
-    print(handle_action(SUBMITTED, REJECT, SAMPLE_MANU))
+    print(handle_action(SUBMITTED, ASSIGN_REF, manu=SAMPLE_MANU, ref='Jack'))
+    print(handle_action(IN_REF_REV, ASSIGN_REF, manu=SAMPLE_MANU, ref='Jill', extra='Extra!'))
+    print(handle_action(IN_REF_REV, DELETE_REF, manu=SAMPLE_MANU, ref='Jill'))
+    print(handle_action(IN_REF_REV, DELETE_REF, manu=SAMPLE_MANU,ref='Jack'))
+    print(handle_action(SUBMITTED, WITHDRAW, manu=SAMPLE_MANU))
+    print(handle_action(SUBMITTED, REJECT, manu=SAMPLE_MANU))
 
 
 if __name__ == '__main__':
