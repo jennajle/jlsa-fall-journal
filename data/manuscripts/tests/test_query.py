@@ -181,3 +181,14 @@ def test_accept_action_with_revisions_valid():
                                     ref="Some ref")
     assert new_state == expected_state
     assert mqry.is_valid_state(new_state)
+
+
+def test_reset_history():
+    manuscript = {
+        "history": [
+            {"from": "SUB", "action": "ARF", "to": "REV"},
+            {"from": "REV", "action": "ACC", "to": "CED"},
+        ]
+    }
+    mqry.reset_history(manuscript)
+    assert manuscript["history"] == []

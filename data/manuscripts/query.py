@@ -190,6 +190,11 @@ def add_to_history(manuscript: dict, curr_state: str, action: str, new_state: st
     })
 
 
+def reset_history(manuscript: dict):
+    manuscript['history'] = []
+    print("History has been reset.")
+
+
 def main():
     print(handle_action(SUBMITTED, ASSIGN_REF, SAMPLE_MANU))
     print(handle_action(SUBMITTED, REJECT, SAMPLE_MANU))
