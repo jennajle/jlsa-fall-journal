@@ -192,3 +192,20 @@ def test_reset_history():
     }
     mqry.reset_history(manuscript)
     assert manuscript["history"] == []
+
+
+def test_add_to_history_empty_history_field():
+    manuscript = {}
+    mqry.add_to_history(manuscript, curr_state="SUB", action="ARF", new_state="REV")
+    assert "history" in manuscript
+    assert manuscript["history"] == [{"from": "SUB", "action": "ARF", "to": "REV"}]
+
+def test_add_to_history_multiple_entries():
+    manuscript = {
+        "history": [{"from": "SUB", "action": "ARF", "to": "REV"}]
+    }
+    mqry.add_to_history(manuscript, curr_state="REV", action="ACC", new_state="CED")
+    assert manuscript["history"] == [
+        {"from": "SUB", "action": "ARF", "to": "REV"},
+        {"from": "REV", "action": "ACC", "to": "CED"}
+    ]
