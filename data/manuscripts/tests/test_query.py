@@ -134,7 +134,7 @@ def test_performance_large_inputs():
     "state, expected_actions",
     [
         ('SUB', ['ARF', 'REJ', 'WIT']),
-        ('REV', ['ARF', 'DRF', 'REJ', 'ACC', 'WIT']),
+        ('REV', ['ARF', 'DRF', 'REJ', 'ACC', 'AWR', 'WIT']),
         ('CED', ['DON', 'WIT']),
         ('REJ', ['WIT']),
     ],
@@ -168,6 +168,15 @@ def test_accept_action_valid():
     curr_state, expected_state = 'REV', 'CED'
     new_state = mqry.handle_action(curr_state=curr_state,
                                     action=mqry.ACCEPT,
+                                    manu=mqry.SAMPLE_MANU_W_REF,
+                                    ref="Some ref")
+    assert new_state == expected_state
+    assert mqry.is_valid_state(new_state)
+
+def test_accept_action_with_revisions_valid():
+    curr_state, expected_state = 'REV', 'AUR'
+    new_state = mqry.handle_action(curr_state=curr_state,
+                                    action=mqry.ACCEPT_REV,
                                     manu=mqry.SAMPLE_MANU_W_REF,
                                     ref="Some ref")
     assert new_state == expected_state

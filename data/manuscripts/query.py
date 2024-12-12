@@ -54,6 +54,7 @@ DONE = 'DON'
 REJECT = 'REJ'
 DELETE_REF = 'DRF'
 WITHDRAW = 'WIT'
+ACCEPT_REV = 'AWR'
 # for testing:
 TEST_ACTION = ACCEPT
 
@@ -96,6 +97,12 @@ def accept(manu:dict, ref: str):
     return COPY_EDIT
 
 
+def accept_with_revisions(manu:dict, ref: str):
+    if ref not in manu[flds.REFEREES]:
+        return IN_REF_REV
+    manu[flds.REFEREES][ref]["verdict"] = "ACCEPT_W_REVISIONS"
+    return AUTHOR_REV
+
 FUNC = 'f'
 
 COMMON_ACTIONS = {
@@ -126,6 +133,9 @@ STATE_TABLE = {
         },
         ACCEPT: {
             FUNC: accept,
+        },
+        ACCEPT_REV: {
+            FUNC: accept_with_revisions,
         },
         **COMMON_ACTIONS,
     },
