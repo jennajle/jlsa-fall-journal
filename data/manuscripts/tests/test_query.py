@@ -134,7 +134,7 @@ def test_performance_large_inputs():
     "state, expected_actions",
     [
         ('SUB', ['ARF', 'REJ', 'WIT']),
-        ('REV', ['ARF', 'DRF', 'WIT']),
+        ('REV', ['ARF', 'DRF', 'REJ', 'ACC', 'WIT']),
         ('CED', ['DON', 'WIT']),
         ('REJ', ['WIT']),
     ],
@@ -151,7 +151,7 @@ def test_handle_action_with_mocked_manuscript():
     manuscript_mock = {
         "title": "Mock Title",
         "author": "Mock Author",
-        "referees": []
+        "referees": {}
     }
     assert mqry.handle_action(curr_state=mqry.SUBMITTED,
                                   action=mqry.ASSIGN_REF,
@@ -162,3 +162,13 @@ def test_handle_action_with_mocked_manuscript():
 def test_withdraw_allowed_in_all_states():
     for state in mqry.STATE_TABLE.keys():
         assert mqry.WITHDRAW in mqry.get_valid_actions_by_state(state)
+
+
+def test_accept_action_valid():
+    curr_state, expected_state = 'REV', 'CED'
+    new_state = mqry.handle_action(curr_state=curr_state,
+                                    action=mqry.ACCEPT,
+                                    manu=mqry.SAMPLE_MANU_W_REF,
+                                    ref="Some ref")
+    assert new_state == expected_state
+    assert mqry.is_valid_state(new_state)

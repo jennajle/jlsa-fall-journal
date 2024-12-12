@@ -6,6 +6,9 @@ IN_REF_REV = 'REV'
 REJECTED = 'REJ'
 SUBMITTED = 'SUB'
 WITHDRAWN = 'WIT'
+EDITOR_REV = 'ERV'
+FORMATTING = "FMT"
+PUBLISHED = "PUB"
 TEST_STATE = SUBMITTED
 
 VALID_STATES = [
@@ -15,6 +18,9 @@ VALID_STATES = [
     REJECTED,
     SUBMITTED,
     WITHDRAWN,
+    EDITOR_REV,
+    FORMATTING,
+    PUBLISHED,
 ]
 
 
@@ -22,10 +28,16 @@ VALID_STATES = [
 SAMPLE_MANU = {
     flds.TITLE: 'Short module import names in Python',
     flds.AUTHOR: 'jlsa',
-    flds.REFEREES: [],
+    flds.REFEREES: {},
     'history': [] # track what states the manuscript went through
 }
 
+SAMPLE_MANU_W_REF = {
+    flds.TITLE: 'Short module import names in Python',
+    flds.AUTHOR: 'jlsa',
+    flds.REFEREES: {'Some ref': {}},
+    'history': [] # track what states the manuscript went through
+}
 
 def get_states() -> list:
     return VALID_STATES
@@ -54,15 +66,6 @@ VALID_ACTIONS = [
     DELETE_REF,
 ]
 
-# can redefine and append more valid actions later on
-VALID_ACTIONS_FOR_STATE = {
-    'SUB': ['ARF', 'REJ'],
-    'REV': ['ACC', 'REJ'],
-    'CED': [],
-    'REJ': [],
-}
-
-
 def get_actions() -> list:
     return VALID_ACTIONS
 
@@ -73,17 +76,24 @@ def is_valid_action(action: str) -> bool:
 
 def assign_ref(manu: dict, ref: str, extra=None) -> str:
     print(extra)
-    manu[flds.REFEREES].append(ref)
+    manu[flds.REFEREES][ref] = {}
     return IN_REF_REV
 
 
 def delete_ref(manu: dict, ref: str) -> str:
     if len(manu[flds.REFEREES]) > 0:
-        manu[flds.REFEREES].remove(ref)
+        del manu[flds.REFEREES][ref]
     if len(manu[flds.REFEREES]) > 0:
         return IN_REF_REV
     else:
         return SUBMITTED
+
+
+def accept(manu:dict, ref: str):
+    if ref not in manu[flds.REFEREES]:
+        return IN_REF_REV
+    manu[flds.REFEREES][ref]["verdict"] = "ACCEPT"
+    return COPY_EDIT
 
 
 FUNC = 'f'
@@ -111,6 +121,12 @@ STATE_TABLE = {
         DELETE_REF: {
             FUNC: delete_ref,
         },
+        REJECT: {
+            FUNC: lambda **kwargs: REJECTED,
+        },
+        ACCEPT: {
+            FUNC: accept,
+        },
         **COMMON_ACTIONS,
     },
     COPY_EDIT: {
@@ -126,6 +142,15 @@ STATE_TABLE = {
         **COMMON_ACTIONS,
     },
     WITHDRAWN: {
+        **COMMON_ACTIONS,
+    },
+    EDITOR_REV: {
+        **COMMON_ACTIONS,
+    },
+    FORMATTING: {
+        **COMMON_ACTIONS,
+    },
+    PUBLISHED: {
         **COMMON_ACTIONS,
     },
 }
@@ -156,12 +181,8 @@ def add_to_history(manuscript: dict, curr_state: str, action: str, new_state: st
 
 
 def main():
-    print(handle_action(SUBMITTED, ASSIGN_REF, manu=SAMPLE_MANU, ref='Jack'))
-    print(handle_action(IN_REF_REV, ASSIGN_REF, manu=SAMPLE_MANU, ref='Jill', extra='Extra!'))
-    print(handle_action(IN_REF_REV, DELETE_REF, manu=SAMPLE_MANU, ref='Jill'))
-    print(handle_action(IN_REF_REV, DELETE_REF, manu=SAMPLE_MANU,ref='Jack'))
-    print(handle_action(SUBMITTED, WITHDRAW, manu=SAMPLE_MANU))
-    print(handle_action(SUBMITTED, REJECT, manu=SAMPLE_MANU))
+    print(handle_action(SUBMITTED, ASSIGN_REF, SAMPLE_MANU))
+    print(handle_action(SUBMITTED, REJECT, SAMPLE_MANU))
 
 
 if __name__ == '__main__':
