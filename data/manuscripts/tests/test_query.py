@@ -157,3 +157,8 @@ def test_handle_action_with_mocked_manuscript():
                                   action=mqry.ASSIGN_REF,
                                   manu=manuscript_mock,
                                   ref="Mock ref") == mqry.IN_REF_REV
+
+
+def test_withdraw_allowed_in_all_states():
+    for state in mqry.STATE_TABLE.keys():
+        assert mqry.WITHDRAW in mqry.get_valid_actions_by_state(state)

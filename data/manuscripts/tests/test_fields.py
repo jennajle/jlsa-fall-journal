@@ -13,6 +13,11 @@ def test_get_flds():
     assert isinstance(mflds.get_flds(), dict)
 
 
+def test_get_fld_names():
+    expected_field_names = mflds.FIELDS.keys()
+    assert list(mflds.get_fld_names()) == list(expected_field_names)
+
+
 def test_flds_structure():
     fields = mflds.get_flds()
     assert isinstance(fields, dict)
