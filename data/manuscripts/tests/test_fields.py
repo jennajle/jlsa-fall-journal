@@ -5,7 +5,13 @@ import pytest
 mflds.FIELDS = {
     mflds.TITLE: {mflds.DISP_NAME: "Title"},
     mflds.AUTHOR: {mflds.DISP_NAME: "Author"},
+    mflds.AUTHOR_EMAIL: {mflds.DISP_NAME: "Author Email"},
+    mflds.STATE: {mflds.DISP_NAME: "State"},
     mflds.REFEREES: {mflds.DISP_NAME: "Referees"},
+    mflds.TEXT: {mflds.DISP_NAME: "Text"},
+    mflds.ABSTRACT: {mflds.DISP_NAME: "Abstract"},
+    mflds.HISTORY: {mflds.DISP_NAME: "History"},
+    mflds.EDITOR: {mflds.DISP_NAME: "Editor"},
 }
 
 
@@ -56,7 +62,13 @@ def test_validate_field_data_valid():
     valid_data = {
         mflds.TITLE: "Harry Potter Philosopher's Stone",
         mflds.AUTHOR: "Harry",
-        mflds.REFEREES: ["Ron", "Hermione"]
+        mflds.AUTHOR_EMAIL: "harrypotter@gmail.com",
+        mflds.STATE: "SUBMITTED",
+        mflds.REFEREES: ["Ron", "Hermione"],
+        mflds.TEXT: "Voldemort is returning.",
+        mflds.ABSTRACT: "Abstract about manuscript.",
+        mflds.HISTORY: [{"from": "SUBMITTED", "action": "REVIEW", "to": "IN_REF_REV"}], # specified in add_to_history
+        mflds.EDITOR: "hagrid@gmail.com",
     }
     assert mflds.validate_field_data(valid_data) is True
 

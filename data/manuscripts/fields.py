@@ -74,12 +74,6 @@ def validate_field_data(field_data: dict) -> bool:
     return True
 
 
-def validate_email(email: str) -> bool:
-    """
-    Validate email is in proper format
-    """
-    return people.is_valid_email(email)
-
 
 def main():
     print(f'{get_flds()=}')
