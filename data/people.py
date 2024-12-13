@@ -41,10 +41,10 @@ VALID_CHARS = '[A-Za-z0-9_.]'
 
 
 def is_valid_email(email: str) -> bool:
-    return re.fullmatch(f"{VALID_CHARS}+@{CHAR_OR_DIGIT}+"
+    return re.fullmatch(f"{VALID_CHARS}+{CHAR_OR_DIGIT}+@{CHAR_OR_DIGIT}+"
                         + "\\."
-                        + f"{CHAR_OR_DIGIT}"
-                        + "{2,3}", email)
+                        + f"{CHAR_OR_DIGIT}{{2,3}}",
+                        email)
 
 
 def is_valid_person(name: str, affiliation: str,

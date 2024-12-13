@@ -1,5 +1,4 @@
-import re
-
+import data.people as people
 
 TITLE = 'title'
 AUTHOR = 'author'
@@ -75,14 +74,11 @@ def validate_field_data(field_data: dict) -> bool:
     return True
 
 
-EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 def validate_email(email: str) -> bool:
     """
     Validate email is in proper format
     """
-    if not re.match(EMAIL_REGEX, email):
-        raise ValueError(f"Invalid email format: {email}")
-    return True
+    return people.is_valid_email(email)
 
 
 def main():
