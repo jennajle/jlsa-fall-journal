@@ -75,6 +75,13 @@ def is_valid_action(action: str) -> bool:
     return action in VALID_ACTIONS
 
 
+def submitted(manu: dict):
+    print(f"Manuscript '{manu[flds.TITLE]}' is SUBMITTED")
+    manu['state'] = SUBMITTED
+    add_to_history(manu, None, 'SUBMIT', SUBMITTED)
+    return SUBMITTED
+
+
 def assign_ref(manu: dict, ref: str, extra=None) -> str:
     print(extra)
     manu[flds.REFEREES][ref] = {}
@@ -100,7 +107,7 @@ def accept(manu:dict, ref: str):
 def accept_with_revisions(manu:dict, ref: str):
     if ref not in manu[flds.REFEREES]:
         return IN_REF_REV
-    manu[flds.REFEREES][ref]["verdict"] = "ACCEPT_W_REVISIONS"
+    manu[flds.REFEREES][ref]["verdict"] = "ACCEPT_W_REVISIONS" # editor has to accept??
     return AUTHOR_REV
 
 FUNC = 'f'
