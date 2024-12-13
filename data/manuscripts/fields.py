@@ -1,15 +1,53 @@
 TITLE = 'title'
-DISP_NAME = 'disp_name'
 AUTHOR = 'author'
+AUTHOR_EMAIL = 'author_email'
+STATE = 'state'
 REFEREES = 'referees'
+TEXT = 'text'
+ABSTRACT = 'abstract'
+HISTORY = 'history'
+EDITOR = 'editor'
+DISP_NAME = 'disp_name'
 
 TEST_FLD_NM = TITLE
 TEST_FLD_DISP_NM = 'Title'
+AUTHOR_DISP_NAME = 'Author'
+AUTHOR_EMAIL_DISP_NAME = 'random@nyu.edu'
+STATE_DISP_NAME = 'State'
+REFEREES_DISP_NAME = 'Referees'
+TEXT_DISP_NAME = 'Text'
+ABSTRACT_DISP_NAME = 'Abstract'
+HISTORY_DISP_NAME = 'History'
+EDITOR_DISP_NAME = 'Editor'
 
 
 FIELDS = {
     TITLE: {
         DISP_NAME: TEST_FLD_DISP_NM,
+    },
+    AUTHOR: {
+        DISP_NAME: AUTHOR_DISP_NAME,
+    },
+    AUTHOR_EMAIL: {
+        DISP_NAME: AUTHOR_EMAIL_DISP_NAME,
+    },
+    STATE: {
+        DISP_NAME: STATE_DISP_NAME,
+    },
+    REFEREES: {
+        DISP_NAME: REFEREES_DISP_NAME,
+    },
+    TEXT: {
+        DISP_NAME: TEXT_DISP_NAME,
+    },
+    ABSTRACT: {
+        DISP_NAME: ABSTRACT_DISP_NAME,
+    },
+    HISTORY: {
+        DISP_NAME: HISTORY_DISP_NAME,
+    },
+    EDITOR: {
+        DISP_NAME: EDITOR_DISP_NAME,
     },
 }
 
