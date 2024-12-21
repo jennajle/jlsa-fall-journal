@@ -68,7 +68,7 @@ class HelloWorld(Resource):
         return {HELLO_RESP: 'world'}
 
 
-@api.route('/endpoints')
+@api.route(ENDPOINT_EP)
 class Endpoints(Resource):
     """
     This class will serve as live, fetchable documentation of what endpoints
@@ -120,19 +120,17 @@ class People(Resource):
         """
         This method creates a new person.
         """
-        form_data = request.json
-        name = form_data.get('name')
-        affiliation = form_data.get('affiliation')
-        email = form_data.get('email')
-        role = form_data.get('role')
-        ret = ppl.create_person(name, affiliation, email, role)
-        if ret is None:
+        try:
+            form_data = request.json
+            name = form_data.get('name')
+            affiliation = form_data.get('affiliation')
+            email = form_data.get('email')
+            role = form_data.get('role')
+            ret = ppl.create_person(name, affiliation, email, role)
             return {'Message':
-                    'Failed to create person, ' +
-                    'person may already exist or data is invalid'
-                    }, 400
-
-        return {'Message': 'Person created successfully', 'Person': ret}, 201
+                    'Person created successfully', 'Person': ret}, 201
+        except ValueError as e:
+            return {'Message': str(e)}, 400
 
     @api.doc('update_person')
     @api.expect(multi_role_person_model)
