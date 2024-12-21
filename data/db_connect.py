@@ -90,6 +90,10 @@ def read(collection, db=SE_DB, no_id=True) -> list:
 
 
 def read_dict(collection, key, db=SE_DB, no_id=True) -> dict:
+    global client
+    if client is None:
+        connect_db()  # Ensure client is initialized
+
     recs = read(collection, db=db, no_id=no_id)
     recs_as_dict = {}
     for rec in recs:
