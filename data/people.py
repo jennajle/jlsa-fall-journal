@@ -63,9 +63,13 @@ def is_valid_person(name: str, affiliation: str,
 
 
 def read() -> dict:
-    people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
-    print(f'{people=}')
-    return people
+    try:
+        people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
+        print(f'{people=}')
+        return people
+    except Exception as e:
+        print(f"Error reading from database: {e}")
+        return {}
 
 
 def exists(email: str) -> bool:
