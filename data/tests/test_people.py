@@ -154,3 +154,19 @@ def test_update_not_there(temp_person):
     with pytest.raises(ValueError):
         ppl.update('Will Fail', 'University of the Void',
                    'Non-existent email', VALID_ROLES)
+
+
+def test_bulk_delete():
+    valid_email1 = "valid1@nyu.edu"
+    valid_email2 = "valid2@nyu.edu"
+    invalid_email = "invalid@nyu.edu"
+    ppl.create("Valid User1", "NYU", valid_email1, TEST_ROLE_CODE)
+    ppl.create("Valid User2", "NYU", valid_email2, TEST_ROLE_CODE)
+
+    emails_to_delete = [valid_email1, valid_email2, invalid_email]
+    deleted_count = ppl.bulk_delete(emails_to_delete)
+
+    assert deleted_count == 2
+    assert not ppl.exists(valid_email1)
+    assert not ppl.exists(valid_email2)
+    assert not ppl.exists(invalid_email)  # invalid email should not exist
