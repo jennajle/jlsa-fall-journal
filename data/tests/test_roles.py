@@ -60,4 +60,4 @@ def test_clear_roles(mock_read_one):
 
     mock_read_one.return_value = mock_person
     ppl.clear_roles(test_email)
-    assert all([role not in mock_person["roles"] for role in rls.get_roles()])
+    assert mock_person["roles"] == []
