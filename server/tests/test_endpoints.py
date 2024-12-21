@@ -2,9 +2,10 @@ from http.client import (
     BAD_REQUEST, # 400
     FORBIDDEN,
     NOT_ACCEPTABLE,
-    NOT_FOUND,
+    NOT_FOUND, # 404
     OK, # 200
     SERVICE_UNAVAILABLE,
+    CREATED, # 201
 )
 
 from unittest.mock import patch
@@ -36,7 +37,7 @@ def test_get_people():
     resp = TEST_CLIENT.get(ep.PEOPLE_EP)
     resp_json= resp.get_json()
     assert isinstance(resp_json, dict)
-    assert resp.status_code == 200 # server has successfully processed request
+    assert resp.status_code == OK
 
 def test_create_person():
     valid_person_data = {
@@ -48,7 +49,7 @@ def test_create_person():
 
     resp = TEST_CLIENT.post(ep.PEOPLE_EP, json=valid_person_data)
     resp_json = resp.get_json()
-    assert resp.status_code == 201  # Success
+    assert resp.status_code == CREATED
     assert 'Person created successfully' in resp_json['Message']
 
 
@@ -82,7 +83,7 @@ def test_delete_role(mock_remove_role, mock_read_one):
     resp = TEST_CLIENT.delete(f"{ep.PEOPLE_EP}/johndoe@nyu.edu/roles/{role}")
     resp_json = resp.get_json()
 
-    assert resp.status_code == 200
+    assert resp.status_code == OK
     assert f"Role {role} removed successfully" in resp_json['Message']
 
     mock_remove_role.assert_called_once_with('johndoe@nyu.edu', role)
@@ -97,7 +98,7 @@ def test_delete_person():
 
     resp = TEST_CLIENT.delete(f"{ep.PEOPLE_EP}/johndoe@nyu.edu")
     resp_json = resp.get_json()
-    assert resp.status_code == 200
+    assert resp.status_code == OK
     assert 'Person deleted successfully' in resp_json['Message']
 
 @patch('data.people.read', autospec=True,
@@ -141,7 +142,7 @@ def test_read_one_not_found(mock_read):
 def test_get_people_with_specific_role(mock_is_valid, mock_read):
     resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/roles/AU')
     resp_json = resp.get_json()
-    assert resp.status_code == 200
+    assert resp.status_code == OK
     assert 'AU' in resp_json
     assert len(resp_json['AU']) == 2
 
@@ -150,7 +151,7 @@ def test_get_people_with_specific_role(mock_is_valid, mock_read):
 def test_get_people_with_invalid_role(mock_is_valid):
     resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/roles/INVALID_ROLE')
     resp_json = resp.get_json()
-    assert resp.status_code == 400 # BAD_REQUEST
+    assert resp.status_code == BAD_REQUEST
     assert 'Invalid role' in resp_json['Message']
 
 
