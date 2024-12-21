@@ -114,6 +114,8 @@ def update(name: str, affiliation: str, email: str, roles: list):
 def add_role(email: str, role: str):
     # Check for if person exists is in endpoints.py
     person = read_one(email)
+    if not person:
+        raise ValueError(f"Person with email {email} does not exist.")
     # Check if role exists
     if not rls.is_valid(role):
         raise ValueError(f"Invalid role: {role}")
@@ -126,6 +128,8 @@ def add_role(email: str, role: str):
 def remove_role(email: str, role: str):
     # Check for if person exists is in endpoints.py
     person = read_one(email)
+    if not person:
+        raise ValueError(f"Person with email {email} does not exist.")
     # Check if role exists
     if not rls.is_valid(role):
         raise ValueError(f"Invalid role: {role}")
