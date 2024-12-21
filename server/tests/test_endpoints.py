@@ -36,8 +36,15 @@ def test_title():
 def test_get_people():
     resp = TEST_CLIENT.get(ep.PEOPLE_EP)
     resp_json= resp.get_json()
-    assert isinstance(resp_json, dict)
-    assert resp.status_code == OK
+
+    if resp.status_code == OK:
+        assert isinstance(resp_json, dict)
+        assert len(resp_json) > 0
+    elif resp.status_code == NOT_FOUND:
+        assert "Message" in resp_json
+        assert resp_json["Message"] == "No people found in the database."
+    else:
+        assert False, f"Unexpected status code: {resp.status_code}"
 
 def test_create_person():
     valid_person_data = {

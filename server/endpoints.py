@@ -110,7 +110,14 @@ class People(Resource):
         """
         This method lists all persons.
         """
-        return ppl.read()
+        try:
+            people = ppl.read()
+            if not people:
+                return {'Message': 'No people found in the database.'}, 404
+            return people, 200
+        except Exception as e:
+            print(f"Error in get(): {e}")
+            return {'Message': 'Internal server error'}, 500
 
     @api.doc('create_person')
     @api.expect(person_model)
