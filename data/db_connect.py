@@ -96,6 +96,7 @@ def read(collection, db=SE_DB, no_id=True) -> list:
 
 def read_dict(collection, key, db=SE_DB, no_id=True) -> dict:
     recs = read(collection, db=db, no_id=no_id)
+    print(f"Raw records: {recs}")
     recs_as_dict = {}
     for rec in recs:
         recs_as_dict[rec[key]] = rec
