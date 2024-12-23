@@ -42,7 +42,7 @@ def connect_db():
                                     + '@cluster0.6nvuo.mongodb.net/'
                                     + '?retryWrites=true&w=majority&'
                                     + 'appName=Cluster0&'
-                                    + 'connectTimeoutMS=30000'
+                                    + 'connectTimeoutMS=10000'
                                     + '&socketTimeoutMS=None'
                                     + '&connect=False&maxPoolsize=1')
         else:
