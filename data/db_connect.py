@@ -1,5 +1,7 @@
 import os
 
+import certifi
+
 import pymongo as pm
 
 LOCAL = "0"
@@ -44,9 +46,10 @@ def connect_db():
                                     + '&w=majority'
                                     + '&appName=Cluster0'
                                     + '&connectTimeoutMS=10000'
-                                    + '&socketTimeoutMS=None'
-                                    + '&connect=False'
-                                    + '&maxPoolsize=1')
+                                    + '&socketTimeoutMS=10000'
+                                    + '&connect=false'
+                                    + '&maxPoolsize=1',
+                                    tlsCAFile=certifi.where())
         else:
             print("Connecting to Mongo locally.")
             client = pm.MongoClient()
