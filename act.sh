@@ -1,2 +1,2 @@
 #/bin/bash
-source demo-repo4-venv/bin/activate
+source jlsa-fall-journal-venv/bin/activate
