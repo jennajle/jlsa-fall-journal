@@ -53,3 +53,4 @@ jobs:
         env:
           # Added to github repo secrets
           DEMO_PA_PWD: ${{secrets.DEMO_PA_PWD}}
+          API_TOKEN: ${{ secrets.API_TOKEN }} 
