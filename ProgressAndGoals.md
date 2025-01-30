@@ -1,4 +1,5 @@
-Completed Work:
+## Completed Work
+
 - Database Integration: Connected the API server to MongoDB database 
 - Masthead page
 - People
@@ -11,7 +12,8 @@ Completed Work:
 - Manuscripts
     - Basic manuscript page 
 
-Goals For This Semester: 
+## Goals For This Semester
+
  - Add role based control and access
     Steps: 
     - Add permission checks in create, update, delete, and read() to ensure only authorized users can modify accounts.
