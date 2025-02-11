@@ -172,6 +172,9 @@ STATE_TABLE = {
         **COMMON_ACTIONS,
     },
     AUTHOR_REV: {
+        DONE: {
+            FUNC: lambda **kwargs: EDITOR_REV,
+        },
         **COMMON_ACTIONS,
     },
     REJECTED: {
@@ -181,9 +184,15 @@ STATE_TABLE = {
         **COMMON_ACTIONS,
     },
     EDITOR_REV: {
+        ACCEPT: {
+            FUNC: accept,
+        },
         **COMMON_ACTIONS,
     },
     FORMATTING: {
+        DONE: {
+            FUNC: lambda **kwargs: PUBLISHED,
+        },
         **COMMON_ACTIONS,
     },
     PUBLISHED: {
@@ -200,7 +209,7 @@ def get_valid_actions_by_state(state: str):
 
 
 def handle_action(manu_id, curr_state, action, **kwargs) -> str:
-    kwargs['manu'] = SAMPLE_MANU
+    kwargs['manu'] = SAMPLE_MANU_W_REF
     if curr_state not in STATE_TABLE:
         raise ValueError(f'Bad state: {curr_state}')
     if action not in STATE_TABLE[curr_state]:
