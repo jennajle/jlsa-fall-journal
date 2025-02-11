@@ -119,11 +119,11 @@ class People(Resource):
         try:
             people = ppl.read()
             if not people:
-                return {'Message': 'No people found in the database.'}, 404
+                return {MESSAGE: 'No people found in the database.'}, 404
             return people, 200
         except Exception as e:
             print(f"Error in get(): {e}")
-            return {'Message': 'Internal server error'}, 500
+            return {MESSAGE: 'Internal server error'}, 500
 
     @api.doc('create_person')
     @api.expect(person_model)
@@ -140,10 +140,10 @@ class People(Resource):
             email = form_data.get('email')
             role = form_data.get('role')
             ret = ppl.create_person(name, affiliation, email, role)
-            return {'Message':
+            return {MESSAGE:
                     'Person created successfully', 'Person': ret}, 201
         except ValueError as e:
-            return {'Message': str(e)}, 400
+            return {MESSAGE: str(e)}, 400
 
     @api.doc('update_person')
     @api.expect(multi_role_person_model)
@@ -160,12 +160,12 @@ class People(Resource):
         roles = form_data.get('roles')
         ret = ppl.update(name, affiliation, email, roles)
         if ret is None:
-            return {'Message':
+            return {MESSAGE:
                     'Failed to create person, ' +
                     'person may not exist yet!'
                     }, 400
 
-        return {'Message': 'Person updated successfully', 'Person': ret}, 201
+        return {MESSAGE: 'Person updated successfully', 'Person': ret}, 201
 
 
 @api.route(f'{PEOPLE_EP}/<email>')
@@ -186,7 +186,7 @@ class Person(Resource):
         ret = ppl.delete(email)
         if ret is not None:
             return {
-                'Message': 'Person deleted successfully',
+                MESSAGE: 'Person deleted successfully',
                 'Deleted': ret
             }, HTTPStatus.OK
         else:
@@ -215,12 +215,12 @@ class RoleManagement(Resource):
         try:
             ppl.add_role(_id, role)
             return {
-                'Message': (
+                MESSAGE: (
                     f"Role {role} added successfully "
                     f"to person with email {_id}")
             }, 200
         except ValueError as e:
-            return {'Message': str(e)}, 400
+            return {MESSAGE: str(e)}, 400
 
     def delete(self, _id, role=None):
         """
@@ -235,19 +235,19 @@ class RoleManagement(Resource):
             if role:
                 ppl.remove_role(_id, role)
                 return {
-                    'Message': (
+                    MESSAGE: (
                         f"Role {role} removed successfully "
                         f"from person with email {_id}")
                 }, 200
             else:
                 ppl.clear_roles(_id)
                 return {
-                    'Message': (
+                    MESSAGE: (
                         f"All roles removed successfully "
                         f"from person with email {_id}")
                 }, 200
         except ValueError as e:
-            return {'Message': str(e)}, 400
+            return {MESSAGE: str(e)}, 400
 
 
 @api.route(f'{PEOPLE_EP}/roles/<role>')
@@ -257,7 +257,7 @@ class RolePeople(Resource):
         This method retrieves all people with a specific role
         """
         if not rls.is_valid(role):
-            return {'Message': f'Invalid role: {role}'}, 400
+            return {MESSAGE: f'Invalid role: {role}'}, 400
 
         people = []
         for person in ppl.read().values():
@@ -267,7 +267,7 @@ class RolePeople(Resource):
 
         if not people:
             return {
-                'Message': f'No people found with role: {role}'}, 404
+                MESSAGE: f'No people found with role: {role}'}, 404
         return {role: people}, 200
 
 
