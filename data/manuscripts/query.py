@@ -5,6 +5,7 @@ AUTHOR = 'author'
 CURR_STATE = 'curr_state'
 DISP_NAME = 'disp_name'
 MANU_ID = '_id'
+REFEREE = 'referees'
 REFEREES = 'referees'
 TITLE = 'title'
 
@@ -47,7 +48,7 @@ VALID_STATES = [
 SAMPLE_MANU = {
     flds.TITLE: 'Short module import names in Python',
     flds.AUTHOR: 'jlsa',
-    flds.REFEREES: {},
+    flds.REFEREES: [],
     'history': [] # track what states the manuscript went through
 }
 
@@ -100,33 +101,32 @@ def submitted(manu: dict):
     add_to_history(manu, None, 'SUBMIT', SUBMITTED)
     return SUBMITTED
 
-
-def assign_ref(manu: dict, ref: str, extra=None) -> str:
-    print(extra)
-    manu[flds.REFEREES][ref] = {}
+# "message": "Bad action: err=TypeError(\"handle_action() got multiple values for argument 'manu_id'\")"
+def assign_ref(manu: dict, referee: str, extra=None) -> str:
+    manu[REFEREES].append(referee)
     return IN_REF_REV
 
 
-def delete_ref(manu: dict, ref: str) -> str:
+def delete_ref(manu: dict, referee: str) -> str:
     if len(manu[flds.REFEREES]) > 0:
-        del manu[flds.REFEREES][ref]
+        manu[flds.REFEREES].remove(referee)
     if len(manu[flds.REFEREES]) > 0:
         return IN_REF_REV
     else:
         return SUBMITTED
 
 
-def accept(manu:dict, ref: str):
-    if ref not in manu[flds.REFEREES]:
+def accept(manu:dict, referee: str, extra=None):
+    if referee not in manu[flds.REFEREES]:
         return IN_REF_REV
-    manu[flds.REFEREES][ref]["verdict"] = "ACCEPT"
+    manu[flds.REFEREES][referee]["verdict"] = "ACCEPT"
     return COPY_EDIT
 
 
-def accept_with_revisions(manu:dict, ref: str):
-    if ref not in manu[flds.REFEREES]:
+def accept_with_revisions(manu:dict, referee: str):
+    if referee not in manu[flds.REFEREES]:
         return IN_REF_REV
-    manu[flds.REFEREES][ref]["verdict"] = "ACCEPT_W_REVISIONS" # editor has to accept??
+    manu[flds.REFEREES][referee]["verdict"] = "ACCEPT_W_REVISIONS" # editor has to accept??
     return AUTHOR_REV
 
 FUNC = 'f'
@@ -199,7 +199,8 @@ def get_valid_actions_by_state(state: str):
     return valid_actions
 
 
-def handle_action(curr_state, action, **kwargs) -> str:
+def handle_action(manu_id, curr_state, action, **kwargs) -> str:
+    kwargs['manu'] = SAMPLE_MANU
     if curr_state not in STATE_TABLE:
         raise ValueError(f'Bad state: {curr_state}')
     if action not in STATE_TABLE[curr_state]:
@@ -222,8 +223,8 @@ def reset_history(manuscript: dict):
 
 
 def main():
-    print(handle_action(SUBMITTED, ASSIGN_REF, SAMPLE_MANU))
-    print(handle_action(SUBMITTED, REJECT, SAMPLE_MANU))
+    print(handle_action(TEST_ID, SUBMITTED, ASSIGN_REF, referee='Jack'))
+    #print(handle_action(SUBMITTED, REJECT, SAMPLE_MANU))
 
 
 if __name__ == '__main__':

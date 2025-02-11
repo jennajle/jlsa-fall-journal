@@ -275,6 +275,7 @@ MANU_ACTION_FLDS = api.model('ManuscriptAction', {
     manu.MANU_ID: fields.String,
     manu.CURR_STATE: fields.String,
     manu.ACTION: fields.String,
+    manu.REFEREE: fields.String,
 })
 
 
@@ -294,7 +295,10 @@ class ReceiveAction(Resource):
             manu_id = request.json.get(manu.MANU_ID)
             curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
-            ret = manu.handle_action(curr_state, action, manu_id=manu_id)
+            kwargs = {}
+            kwargs[manu.REFEREE] = request.json.get(manu.REFEREE)
+            ret = manu.handle_action(
+                curr_state, action, manu_id=manu_id, **kwargs)
         except Exception as err:
             raise wz.NotAcceptable(f'Bad action: ' f'{err=}')
         return {
