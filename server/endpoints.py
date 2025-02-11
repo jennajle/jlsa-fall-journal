@@ -13,6 +13,7 @@ import data.roles as rls
 from flask import request
 
 import data.people as ppl
+import data.manuscripts as manu
 
 app = Flask(__name__)
 CORS(app)
@@ -52,6 +53,11 @@ EDITORS = 'Alex, Leo, Jenna, Sejuti'
 DATE_RESP = 'Date'
 DATE = '2024-10-02'
 PEOPLE_EP = '/people'
+MANU_EP = '/manuscripts'
+
+
+MESSAGE = 'Message'
+RETURN = 'return'
 
 
 @api.route(HELLO_EP)
@@ -263,3 +269,35 @@ class RolePeople(Resource):
             return {
                 'Message': f'No people found with role: {role}'}, 404
         return {role: people}, 200
+
+
+MANU_ACTION_FLDS = api.model('ManuscriptAction', {
+    manu.MANU_ID: fields.String,
+    manu.CURR_STATE: fields.String,
+    manu.ACTION: fields.String,
+})
+
+
+@api.route(f'{MANU_EP}/receive_action')
+class ReceiveAction(Resource):
+    """
+    Receive an action for a manuscript.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.expect(MANU_ACTION_FLDS)
+    def put(self):
+        """
+        Receive an action for a manuscript.
+        """
+        try:
+            manu_id = request.json.get(manu.MANU_ID)
+            curr_state = request.json.get(manu.CURR_STATE)
+            action = request.json.get(manu.ACTION)
+            ret = manu.handle_action(curr_state, action, manu_id=manu_id)
+        except Exception as err:
+            raise wz.NotAcceptable(f'Bad action: ' f'{err=}')
+        return {
+            MESSAGE: 'Action received!',
+            RETURN: ret,
+        }
