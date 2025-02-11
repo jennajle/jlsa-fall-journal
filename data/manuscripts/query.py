@@ -5,7 +5,7 @@ AUTHOR = 'author'
 CURR_STATE = 'curr_state'
 DISP_NAME = 'disp_name'
 MANU_ID = '_id'
-REFEREE = 'referees'
+REFEREE = 'referee'
 REFEREES = 'referees'
 TITLE = 'title'
 
