@@ -14,6 +14,7 @@ import pytest
 
 import server.endpoints as ep
 
+import data.manuscripts as manu
 from data.people import NAME
 
 TEST_CLIENT = ep.app.test_client()
@@ -163,3 +164,15 @@ def test_get_people_with_invalid_role(mock_is_valid):
     resp_json = resp.get_json()
     assert resp.status_code == BAD_REQUEST
     assert 'Invalid role' in resp_json['Message']
+
+
+@patch('data.manuscripts.handle_action', autospec=True,
+       return_value='SOME STRING')
+def test_handle_action(mock_read):
+    resp = TEST_CLIENT.put(f'{ep.MANU_EP}/receive_action',
+                           json={
+                               manu.MANU_ID: 'some id',
+                               manu.CURR_STATE: 'some state',
+                               manu.ACTION: 'some action',
+                           })
+    assert resp.status_code == OK
