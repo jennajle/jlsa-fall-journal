@@ -101,15 +101,15 @@ def submitted(manu: dict):
     add_to_history(manu, None, 'SUBMIT', SUBMITTED)
     return SUBMITTED
 
-# "message": "Bad action: err=TypeError(\"handle_action() got multiple values for argument 'manu_id'\")"
+
 def assign_ref(manu: dict, referee: str, extra=None) -> str:
-    manu[REFEREES].append(referee)
+    manu[flds.REFEREES][referee] = {}
     return IN_REF_REV
 
 
 def delete_ref(manu: dict, referee: str) -> str:
-    if len(manu[flds.REFEREES]) > 0:
-        manu[flds.REFEREES].remove(referee)
+    if referee in manu[flds.REFEREES]:
+        del manu[flds.REFEREES][referee]
     if len(manu[flds.REFEREES]) > 0:
         return IN_REF_REV
     else:
