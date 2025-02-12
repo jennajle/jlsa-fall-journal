@@ -115,7 +115,11 @@ def delete_ref(manu: dict, referee: str) -> str:
     else:
         return SUBMITTED
 
-
+# NEED TO FIX
+# def accept(manu: dict,  extra=None):
+#     if manu.get("state") != IN_REF_REV:
+#         return manu.get("state")  # Do not transition if not in review.
+#     return COPY_EDIT
 def accept(manu:dict, referee: str, extra=None):
     if referee not in manu[flds.REFEREES]:
         return IN_REF_REV
@@ -123,10 +127,11 @@ def accept(manu:dict, referee: str, extra=None):
     return COPY_EDIT
 
 
+
 def accept_with_revisions(manu:dict, referee: str):
     if referee not in manu[flds.REFEREES]:
         return IN_REF_REV
-    manu[flds.REFEREES][referee]["verdict"] = "ACCEPT_W_REVISIONS" # editor has to accept??
+    manu[flds.REFEREES][referee]["verdict"] = "ACCEPT_W_REVISIONS"
     return AUTHOR_REV
 
 FUNC = 'f'
@@ -208,15 +213,6 @@ def get_valid_actions_by_state(state: str):
     return valid_actions
 
 
-def handle_action(manu_id, curr_state, action, **kwargs) -> str:
-    kwargs['manu'] = SAMPLE_MANU_W_REF
-    if curr_state not in STATE_TABLE:
-        raise ValueError(f'Bad state: {curr_state}')
-    if action not in STATE_TABLE[curr_state]:
-        raise ValueError(f'{action} not available in {curr_state}')
-    return STATE_TABLE[curr_state][action][FUNC](**kwargs)
-
-
 def add_to_history(manuscript: dict, curr_state: str, action: str, new_state: str):
     history = manuscript.setdefault('history', [])
     history.append({
@@ -231,9 +227,27 @@ def reset_history(manuscript: dict):
     print("History has been reset.")
 
 
+def handle_action(manu_id, curr_state, action, **kwargs) -> str:
+    kwargs['manu'] = SAMPLE_MANU_W_REF
+    if curr_state not in STATE_TABLE:
+        raise ValueError(f'Bad state: {curr_state}')
+    if action not in STATE_TABLE[curr_state]:
+        raise ValueError(f'{action} not available in {curr_state}')
+    return STATE_TABLE[curr_state][action][FUNC](**kwargs)
+
+
 def main():
+    print(handle_action(TEST_ID, SUBMITTED, WITHDRAW))
+    print(handle_action(TEST_ID, SUBMITTED, REJECT))
+
     print(handle_action(TEST_ID, SUBMITTED, ASSIGN_REF, referee='Jack'))
-    #print(handle_action(SUBMITTED, REJECT, SAMPLE_MANU))
+    print(handle_action(TEST_ID, IN_REF_REV, ASSIGN_REF,
+                        referee='Jill', extra='Extra!'))
+
+    print(handle_action(TEST_ID, IN_REF_REV, DELETE_REF,
+                        referee='Jill'))
+
+    print(handle_action(TEST_ID, IN_REF_REV, ACCEPT))
 
 
 if __name__ == '__main__':
