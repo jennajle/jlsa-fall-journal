@@ -235,17 +235,16 @@ def handle_action(manu_id, curr_state, action, **kwargs) -> str:
 
 
 def main():
+    print("Submitted")
     print(handle_action(TEST_ID, SUBMITTED, WITHDRAW))
     print(handle_action(TEST_ID, SUBMITTED, REJECT))
-
     print(handle_action(TEST_ID, SUBMITTED, ASSIGN_REF, referee='Jack'))
-    print(handle_action(TEST_ID, IN_REF_REV, ASSIGN_REF,
-                        referee='Jill', extra='Extra!'))
-
-    print(handle_action(TEST_ID, IN_REF_REV, DELETE_REF,
-                        referee='Jill'))
 
     print("Referee Review")
+    print(handle_action(TEST_ID, IN_REF_REV, ASSIGN_REF,
+                        referee='Jill', extra='Extra!'))
+    print(handle_action(TEST_ID, IN_REF_REV, DELETE_REF,
+                        referee='Jill'))
     print(handle_action(TEST_ID, IN_REF_REV, ACCEPT))
     print(handle_action(TEST_ID, IN_REF_REV, ACCEPT_REV))
 
@@ -260,6 +259,7 @@ def main():
 
     print("Author Review")
     print(handle_action(TEST_ID, AUTHOR_REVIEW, DONE))
+    print(handle_action(TEST_ID, AUTHOR_REVIEW, WITHDRAW))
 
     print("Formatting")
     print(handle_action(TEST_ID, FORMATTING, DONE))
