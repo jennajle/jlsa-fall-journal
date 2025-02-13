@@ -307,17 +307,17 @@ class ReceiveAction(Resource):
         }
 
 
-@api.route(f'{PEOPLE_EP}/search')
+@api.route(f"{PEOPLE_EP}/search")
 class PersonSearch(Resource):
     def get(self):
         """
         Search for people based on query parameters (name, email, or role).
         """
-        query = request.args.get('query')
+        query = request.args.get("query")
         if not query:
-            return {MESSAGE: "No search query provided"}, HTTPStatus.BAD_REQUEST
-        
-        results = ppl.search(query) 
+            return {MESSAGE: "No search query"}, HTTPStatus.BAD_REQUEST
+        results = ppl.search(query)
         if not results:
             return {MESSAGE: "No matching people found"}, HTTPStatus.NOT_FOUND
+
         return results, HTTPStatus.OK

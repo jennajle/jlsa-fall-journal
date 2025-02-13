@@ -217,6 +217,24 @@ def bulk_delete(emails: list):
     return deleted_count
 
 
+def search(query: str) -> dict:
+    """
+    Search for people by name, email, or role.
+
+    """
+    people = read()
+    query_lower = query.lower()
+    matches = {
+        email: person
+        for email, person in people.items()
+        if query_lower in person.get(NAME, '').lower()
+        or query_lower in email.lower()
+        or any(query_lower in role.lower() for role in person.get(ROLES, []))
+    }
+
+    return matches
+
+
 def main():
     print(get_masthead())
 
