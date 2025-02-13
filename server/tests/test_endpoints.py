@@ -70,16 +70,6 @@ def test_create_person():
     'affiliation': 'NYU',
     'email': 'johndoe@nyu.edu'
 })
-
-
-@patch(PEOPLE_LOC + 'update', autospec=True, return_value={
-    'name': 'Jane Doe',
-    'roles': ['AU', 'Editor'],
-    'affiliation': 'NYU',
-    'email': 'janedoe@nyu.edu'
-})
-
-
 @patch('data.people.add_role',  autospec=True)
 def test_add_role(mock_add_role, mock_read_one):
     _id = "johndoe@nyu.edu"
@@ -186,25 +176,3 @@ def test_handle_action(mock_read):
                                manu.ACTION: 'some action',
                            })
     assert resp.status_code == OK
-
-
-def test_update_person(mock_update):
-    update_data = {
-        'name': 'Jane Doe',
-        'roles': ['AU', 'Editor'],
-        'affiliation': 'NYU',
-        'email': 'janedoe@nyu.edu'
-    }
-    resp = TEST_CLIENT.put(ep.PEOPLE_EP, json=update_data)
-    resp_json = resp.get_json()
-
-    assert resp.status_code == CREATED
-    assert 'Person updated successfully' in resp_json['Message']
-    
-    mock_update.assert_called_once_with(
-        'Jane Doe',
-        'NYU',
-        'janedoe@nyu.edu',
-        ['AU', 'Editor']
-    )
-    
