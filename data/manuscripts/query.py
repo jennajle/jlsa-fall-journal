@@ -23,12 +23,13 @@ FIELDS = {
 REJECTED = 'REJ'
 SUBMITTED = 'SUB'
 WITHDRAWN = 'WIT'
-FORMATTING = "FMT"
-PUBLISHED = "PUB"
 IN_REF_REV = 'REV'
 AUTHOR_REVISIONS = 'AUR'
 EDITOR_REV = 'ERV'
 COPY_EDIT = 'CED'
+AUTHOR_REVIEW = 'ARE'
+FORMATTING = "FMT"
+PUBLISHED = "PUB"
 
 TEST_STATE = SUBMITTED
 
@@ -36,12 +37,13 @@ VALID_STATES = [
     REJECTED,
     SUBMITTED,
     WITHDRAWN,
-    FORMATTING,
-    PUBLISHED,
     IN_REF_REV,
     AUTHOR_REVISIONS,
     EDITOR_REV,
     COPY_EDIT,
+    AUTHOR_REVIEW,
+    FORMATTING,
+    PUBLISHED,
 ]
 
 
@@ -76,7 +78,6 @@ DELETE_REF = 'DRF'
 WITHDRAW = 'WIT'
 ACCEPT = 'ACC'
 ACCEPT_REV = 'ACR'
-AUTHOR_REV_DONE = 'AUD'
 # for testing:
 TEST_ACTION = ACCEPT
 
@@ -88,7 +89,6 @@ VALID_ACTIONS = [
     DELETE_REF,
     ACCEPT,
     ACCEPT_REV,
-    AUTHOR_REV_DONE,
 ]
 
 def get_actions() -> list:
@@ -126,13 +126,6 @@ def accept(manu: dict,  extra=None, **kwargs) -> str :
     return COPY_EDIT
 
 
-def accept_with_revisions(manu:dict, extra=None, **kwargs) -> str :
-    return AUTHOR_REVISIONS
-
-def author_revisions_done(manu:dict, extra=None, **kwargs) -> str :
-    return EDITOR_REV
-
-
 FUNC = 'f'
 
 COMMON_ACTIONS = {
@@ -165,20 +158,11 @@ STATE_TABLE = {
             FUNC: accept,
         },
         ACCEPT_REV: {
-            FUNC: accept_with_revisions,
-        },
-        **COMMON_ACTIONS,
-    },
-    COPY_EDIT: {
-        DONE: {
             FUNC: lambda **kwargs: AUTHOR_REVISIONS,
         },
         **COMMON_ACTIONS,
     },
     AUTHOR_REVISIONS: {
-        AUTHOR_REV_DONE: {
-            FUNC: author_revisions_done,
-        },
         DONE: {
             FUNC: lambda **kwargs: EDITOR_REV,
         },
@@ -193,6 +177,18 @@ STATE_TABLE = {
     EDITOR_REV: {
         ACCEPT: {
             FUNC: accept,
+        },
+        **COMMON_ACTIONS,
+    },
+    COPY_EDIT: {
+        DONE: {
+            FUNC: lambda **kwargs: AUTHOR_REVIEW,
+        },
+        **COMMON_ACTIONS,
+    },
+    AUTHOR_REVIEW:{
+        DONE: {
+            FUNC: lambda **kwargs: FORMATTING,
         },
         **COMMON_ACTIONS,
     },
@@ -254,10 +250,19 @@ def main():
     print(handle_action(TEST_ID, IN_REF_REV, ACCEPT_REV))
 
     print("Author Revisions")
-    print(handle_action(TEST_ID, AUTHOR_REVISIONS, AUTHOR_REV_DONE))
+    print(handle_action(TEST_ID, AUTHOR_REVISIONS, DONE))
 
     print("Editor Review")
     print(handle_action(TEST_ID, EDITOR_REV, ACCEPT))
+
+    print("Copy Edit")
+    print(handle_action(TEST_ID, COPY_EDIT, DONE))
+
+    print("Author Review")
+    print(handle_action(TEST_ID, AUTHOR_REVIEW, DONE))
+
+    print("Formatting")
+    print(handle_action(TEST_ID, FORMATTING, DONE))
 
 
 if __name__ == '__main__':
