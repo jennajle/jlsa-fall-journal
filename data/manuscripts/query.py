@@ -55,7 +55,7 @@ SAMPLE_MANU = {
 SAMPLE_MANU_W_REF = {
     flds.TITLE: 'Short module import names in Python',
     flds.AUTHOR: 'jlsa',
-    flds.REFEREES: {'Some ref': {}},
+    flds.REFEREES: ['Some ref'],
     'history': [] # track what states the manuscript went through
 }
 
@@ -74,7 +74,7 @@ DONE = 'DON'
 REJECT = 'REJ'
 DELETE_REF = 'DRF'
 WITHDRAW = 'WIT'
-ACCEPT_REV = 'AWR'
+ACCEPT_REV = 'ACR'
 # for testing:
 TEST_ACTION = ACCEPT
 
@@ -85,6 +85,7 @@ VALID_ACTIONS = [
     REJECT,
     WITHDRAW,
     DELETE_REF,
+    ACCEPT_REV,
 ]
 
 def get_actions() -> list:
@@ -103,36 +104,28 @@ def submitted(manu: dict):
 
 
 def assign_ref(manu: dict, referee: str, extra=None) -> str:
-    manu[flds.REFEREES][referee] = {}
+    manu[REFEREES].append(referee)
     return IN_REF_REV
 
 
 def delete_ref(manu: dict, referee: str) -> str:
     if referee in manu[flds.REFEREES]:
-        del manu[flds.REFEREES][referee]
+        manu[REFEREES].remove(referee)
     if len(manu[flds.REFEREES]) > 0:
         return IN_REF_REV
     else:
         return SUBMITTED
 
-# NEED TO FIX
-# def accept(manu: dict,  extra=None):
-#     if manu.get("state") != IN_REF_REV:
-#         return manu.get("state")  # Do not transition if not in review.
-#     return COPY_EDIT
-def accept(manu:dict, referee: str, extra=None):
-    if referee not in manu[flds.REFEREES]:
-        return IN_REF_REV
-    manu[flds.REFEREES][referee]["verdict"] = "ACCEPT"
+# if kwargs is not added
+# test_handle_action_valid_return -
+# TypeError: accept_with_revisions() got an unexpected keyword argument 'referee'
+def accept(manu: dict,  extra=None, **kwargs) -> str :
     return COPY_EDIT
 
 
-
-def accept_with_revisions(manu:dict, referee: str):
-    if referee not in manu[flds.REFEREES]:
-        return IN_REF_REV
-    manu[flds.REFEREES][referee]["verdict"] = "ACCEPT_W_REVISIONS"
+def accept_with_revisions(manu:dict, extra=None, **kwargs) -> str :
     return AUTHOR_REV
+
 
 FUNC = 'f'
 
@@ -248,6 +241,8 @@ def main():
                         referee='Jill'))
 
     print(handle_action(TEST_ID, IN_REF_REV, ACCEPT))
+
+    print(handle_action(TEST_ID, IN_REF_REV, ACCEPT_REV))
 
 
 if __name__ == '__main__':
