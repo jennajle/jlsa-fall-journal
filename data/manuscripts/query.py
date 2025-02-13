@@ -20,27 +20,28 @@ FIELDS = {
 }
 
 # states
-AUTHOR_REV = 'AUR'
-COPY_EDIT = 'CED'
-IN_REF_REV = 'REV'
 REJECTED = 'REJ'
 SUBMITTED = 'SUB'
 WITHDRAWN = 'WIT'
-EDITOR_REV = 'ERV'
 FORMATTING = "FMT"
 PUBLISHED = "PUB"
+IN_REF_REV = 'REV'
+AUTHOR_REVISIONS = 'AUR'
+EDITOR_REV = 'ERV'
+COPY_EDIT = 'CED'
+
 TEST_STATE = SUBMITTED
 
 VALID_STATES = [
-    AUTHOR_REV,
-    COPY_EDIT,
-    IN_REF_REV,
     REJECTED,
     SUBMITTED,
     WITHDRAWN,
-    EDITOR_REV,
     FORMATTING,
     PUBLISHED,
+    IN_REF_REV,
+    AUTHOR_REVISIONS,
+    EDITOR_REV,
+    COPY_EDIT,
 ]
 
 
@@ -68,24 +69,26 @@ def is_valid_state(state: str) -> bool:
 
 
 # actions:
-ACCEPT = 'ACC'
 ASSIGN_REF = 'ARF'
 DONE = 'DON'
 REJECT = 'REJ'
 DELETE_REF = 'DRF'
 WITHDRAW = 'WIT'
+ACCEPT = 'ACC'
 ACCEPT_REV = 'ACR'
+AUTHOR_REV_DONE = 'AUD'
 # for testing:
 TEST_ACTION = ACCEPT
 
 VALID_ACTIONS = [
-    ACCEPT,
     ASSIGN_REF,
     DONE,
     REJECT,
     WITHDRAW,
     DELETE_REF,
+    ACCEPT,
     ACCEPT_REV,
+    AUTHOR_REV_DONE,
 ]
 
 def get_actions() -> list:
@@ -124,7 +127,10 @@ def accept(manu: dict,  extra=None, **kwargs) -> str :
 
 
 def accept_with_revisions(manu:dict, extra=None, **kwargs) -> str :
-    return AUTHOR_REV
+    return AUTHOR_REVISIONS
+
+def author_revisions_done(manu:dict, extra=None, **kwargs) -> str :
+    return EDITOR_REV
 
 
 FUNC = 'f'
@@ -165,11 +171,14 @@ STATE_TABLE = {
     },
     COPY_EDIT: {
         DONE: {
-            FUNC: lambda **kwargs: AUTHOR_REV,
+            FUNC: lambda **kwargs: AUTHOR_REVISIONS,
         },
         **COMMON_ACTIONS,
     },
-    AUTHOR_REV: {
+    AUTHOR_REVISIONS: {
+        AUTHOR_REV_DONE: {
+            FUNC: author_revisions_done,
+        },
         DONE: {
             FUNC: lambda **kwargs: EDITOR_REV,
         },
@@ -240,9 +249,15 @@ def main():
     print(handle_action(TEST_ID, IN_REF_REV, DELETE_REF,
                         referee='Jill'))
 
+    print("Referee Review")
     print(handle_action(TEST_ID, IN_REF_REV, ACCEPT))
-
     print(handle_action(TEST_ID, IN_REF_REV, ACCEPT_REV))
+
+    print("Author Revisions")
+    print(handle_action(TEST_ID, AUTHOR_REVISIONS, AUTHOR_REV_DONE))
+
+    print("Editor Review")
+    print(handle_action(TEST_ID, EDITOR_REV, ACCEPT))
 
 
 if __name__ == '__main__':
