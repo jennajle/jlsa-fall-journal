@@ -234,6 +234,21 @@ def handle_action(manu_id, curr_state, action, **kwargs) -> str:
     return STATE_TABLE[curr_state][action][FUNC](**kwargs)
 
 
+def get_history(manu: dict):
+    return manu.get('history', [])
+
+
+def get_current_state(manu: dict) -> str:
+    return manu.get('state', 'Unknown')
+
+
+def get_available_actions(manu: dict):
+    state = get_current_state(manu)
+    if state in STATE_TABLE:
+        return list(STATE_TABLE[state].keys())
+    return []
+
+
 def main():
     print("Submitted")
     print(handle_action(TEST_ID, SUBMITTED, WITHDRAW))
