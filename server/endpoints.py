@@ -119,7 +119,7 @@ class People(Resource):
         try:
             people = ppl.read()
             if not people:
-                return {MESSAGE: 'No people found in the database.'}, 404
+                return {}, 200  # Return empty instead of error
             return people, 200
         except Exception as e:
             print(f"Error in get(): {e}")

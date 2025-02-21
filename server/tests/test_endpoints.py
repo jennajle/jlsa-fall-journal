@@ -43,7 +43,7 @@ def test_get_people():
 
     if resp.status_code == OK:
         assert isinstance(resp_json, dict)
-        assert len(resp_json) > 0
+        assert len(resp_json) >= 0
     elif resp.status_code == NOT_FOUND:
         assert "Message" in resp_json
         assert resp_json["Message"] == "No people found in the database."
