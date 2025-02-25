@@ -125,7 +125,7 @@ class People(Resource):
             return {MESSAGE: 'Internal server error'}, 500
 
     @api.doc('create_person')
-    @api.expect(person_model)
+    @api.expect(multi_role_person_model)
     @api.response(201, 'Person created successfully')
     @api.response(400, 'Invalid input or person already exists')
     def post(self):
@@ -137,8 +137,8 @@ class People(Resource):
             name = form_data.get('name')
             affiliation = form_data.get('affiliation')
             email = form_data.get('email')
-            role = form_data.get('role')
-            ret = ppl.create_person(name, affiliation, email, role)
+            roles = form_data.get('roles')
+            ret = ppl.create_person(name, affiliation, email, roles)
             return {MESSAGE:
                     'Person created successfully', 'Person': ret}, 201
         except ValueError as e:
