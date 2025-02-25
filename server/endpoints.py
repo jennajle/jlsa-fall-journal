@@ -146,7 +146,7 @@ class People(Resource):
 
     @api.doc('update_person')
     @api.expect(multi_role_person_model)
-    @api.response(201, 'Person created successfully')
+    @api.response(200, 'Person created successfully')
     @api.response(400, 'Invalid input or person does not exist')
     def put(self):
         """
@@ -164,7 +164,7 @@ class People(Resource):
                     'person may not exist yet!'
                     }, 400
 
-        return {MESSAGE: 'Person updated successfully', 'Person': ret}, 201
+        return {MESSAGE: 'Person updated successfully', 'Person': ret}, 200
 
 
 @api.route(f'{PEOPLE_EP}/<email>')
