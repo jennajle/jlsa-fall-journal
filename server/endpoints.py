@@ -5,7 +5,7 @@ The endpoint called `endpoints` will return all available endpoints.
 from http import HTTPStatus
 
 from flask import Flask, request
-from flask_restx import Resource, Api, fields, Namespace
+from flask_restx import Resource, Api, fields
 from flask_cors import CORS
 import werkzeug.exceptions as wz
 import data.roles as rls
@@ -325,11 +325,16 @@ class PersonSearch(Resource):
 manuscript_model = api.model('Manuscript', {
     'manu_id': fields.String(required=True, description="Manuscript id"),
     'title': fields.String(required=True, description="Manuscript title"),
-    'author': fields.String(required=True, description="Author of the manuscript"),
-    'text': fields.String(required=False, description="Content of the manuscript"),
-    'referees': fields.List(fields.String, description="List of referees", default=[]),
-    'history': fields.List(fields.Raw, description="Manuscript history", default=[]),
+    'author': fields.String(required=True,
+                            description="Author of the manuscript"),
+    'text': fields.String(required=False,
+                          description="Content of the manuscript"),
+    'referees': fields.List(fields.String,
+                            description="List of referees", default=[]),
+    'history': fields.List(fields.Raw,
+                           description="Manuscript history", default=[]),
 })
+
 
 @api.route(MANU_EP)
 class Manuscripts(Resource):
@@ -347,7 +352,9 @@ class Manuscripts(Resource):
         }
 
         result = create('manuscripts', manuscript)
-        return {'message': 'Manuscript created', 'id': str(result.inserted_id)}, HTTPStatus.CREATED
+        return {'message': 'Manuscript created',
+                'id': str(result.inserted_id)}, HTTPStatus.CREATED
+
     def get(self):
         """Get all manuscripts"""
         try:
@@ -355,7 +362,8 @@ class Manuscripts(Resource):
             return manuscripts, HTTPStatus.OK
         except Exception as e:
             print(f"Error in get(): {e}")
-            return {'message': 'Internal server error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+            return {'message': 'Internal server error'},
+            HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 @api.route(f'{MANU_EP}/<string:manu_id>')
@@ -367,7 +375,9 @@ class ManuscriptById(Resource):
             if delete_count > 0:
                 return {'message': 'Manuscript deleted'}, HTTPStatus.OK
             else:
-                return {'message': 'Manuscript not found'}, HTTPStatus.NOT_FOUND
+                return {'message': 'Manuscript not found'},
+                HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in delete(): {e}")
-            return {'message': 'Internal server error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+            return {'message': 'Internal server error'},
+            HTTPStatus.INTERNAL_SERVER_ERROR
