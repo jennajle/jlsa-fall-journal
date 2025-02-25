@@ -4,16 +4,15 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 from http import HTTPStatus
 
-from flask import Flask  # , request
-from flask_restx import Resource, Api, fields  # Namespace, fields
+from flask import Flask, request
+from flask_restx import Resource, Api, fields, Namespace
 from flask_cors import CORS
 import werkzeug.exceptions as wz
 import data.roles as rls
 
-from flask import request
-
 import data.people as ppl
 import data.manuscripts as manu
+from data.db_connect import create, read, delete
 
 app = Flask(__name__)
 CORS(app)
@@ -143,7 +142,7 @@ class People(Resource):
             return {MESSAGE:
                     'Person created successfully', 'Person': ret}, 201
         except ValueError as e:
-            return {MESSAGE: str(e)}, 400
+            return {MESSAGE: str(e)}, 406
 
     @api.doc('update_person')
     @api.expect(multi_role_person_model)
@@ -321,3 +320,54 @@ class PersonSearch(Resource):
             return {MESSAGE: "No matching people found"}, HTTPStatus.NOT_FOUND
 
         return results, HTTPStatus.OK
+
+
+manuscript_model = api.model('Manuscript', {
+    'manu_id': fields.String(required=True, description="Manuscript id"),
+    'title': fields.String(required=True, description="Manuscript title"),
+    'author': fields.String(required=True, description="Author of the manuscript"),
+    'text': fields.String(required=False, description="Content of the manuscript"),
+    'referees': fields.List(fields.String, description="List of referees", default=[]),
+    'history': fields.List(fields.Raw, description="Manuscript history", default=[]),
+})
+
+@api.route(MANU_EP)
+class Manuscripts(Resource):
+    @api.expect(manuscript_model)
+    def post(self):
+        """Create a new manuscript"""
+        data = request.json
+        manuscript = {
+            'manu_id': data.get('manu_id'),
+            'title': data.get('title'),
+            'author': data.get('author'),
+            'text': data.get('text'),
+            'referees': data.get('referees', []),
+            'history': []
+        }
+
+        result = create('manuscripts', manuscript)
+        return {'message': 'Manuscript created', 'id': str(result.inserted_id)}, HTTPStatus.CREATED
+    def get(self):
+        """Get all manuscripts"""
+        try:
+            manuscripts = read('manuscripts')
+            return manuscripts, HTTPStatus.OK
+        except Exception as e:
+            print(f"Error in get(): {e}")
+            return {'message': 'Internal server error'}, HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@api.route(f'{MANU_EP}/<string:manu_id>')
+class ManuscriptById(Resource):
+    def delete(self, manu_id):
+        """Delete a manuscript by manu_id"""
+        try:
+            delete_count = delete('manuscripts', {'manu_id': manu_id})
+            if delete_count > 0:
+                return {'message': 'Manuscript deleted'}, HTTPStatus.OK
+            else:
+                return {'message': 'Manuscript not found'}, HTTPStatus.NOT_FOUND
+        except Exception as e:
+            print(f"Error in delete(): {e}")
+            return {'message': 'Internal server error'}, HTTPStatus.INTERNAL_SERVER_ERROR
