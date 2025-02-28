@@ -7,6 +7,7 @@ from http import HTTPStatus
 from flask import Flask, request
 from flask_restx import Resource, Api, fields
 from flask_cors import CORS
+from bson import ObjectId
 import werkzeug.exceptions as wz
 import data.roles as rls
 
@@ -271,6 +272,22 @@ class RolePeople(Resource):
         return {role: people}, 200
 
 
+@api.route(f"{PEOPLE_EP}/search")
+class PersonSearch(Resource):
+    def get(self):
+        """
+        Search for people based on query parameters (name, email, or role).
+        """
+        query = request.args.get("query")
+        if not query:
+            return {MESSAGE: "No search query"}, HTTPStatus.BAD_REQUEST
+        results = ppl.search(query)
+        if not results:
+            return {MESSAGE: "No matching people found"}, HTTPStatus.NOT_FOUND
+
+        return results, HTTPStatus.OK
+
+
 MANU_ACTION_FLDS = api.model('ManuscriptAction', {
     manu.MANU_ID: fields.String,
     manu.CURR_STATE: fields.String,
@@ -307,27 +324,14 @@ class ReceiveAction(Resource):
         }
 
 
-@api.route(f"{PEOPLE_EP}/search")
-class PersonSearch(Resource):
-    def get(self):
-        """
-        Search for people based on query parameters (name, email, or role).
-        """
-        query = request.args.get("query")
-        if not query:
-            return {MESSAGE: "No search query"}, HTTPStatus.BAD_REQUEST
-        results = ppl.search(query)
-        if not results:
-            return {MESSAGE: "No matching people found"}, HTTPStatus.NOT_FOUND
-
-        return results, HTTPStatus.OK
-
-
 manuscript_model = api.model('Manuscript', {
-    'manu_id': fields.String(required=True, description="Manuscript id"),
     'title': fields.String(required=True, description="Manuscript title"),
     'author': fields.String(required=True,
                             description="Author of the manuscript"),
+    'author_email': fields.String(required=True,
+                                  description="Author of the manuscript"),
+    'abstract': fields.String(required=True,
+                              description="Manuscript abstract"),
     'text': fields.String(required=False,
                           description="Content of the manuscript"),
     'referees': fields.List(fields.String,
@@ -344,9 +348,10 @@ class Manuscripts(Resource):
         """Create a new manuscript"""
         data = request.json
         manuscript = {
-            'manu_id': data.get('manu_id'),
             'title': data.get('title'),
             'author': data.get('author'),
+            'author_email': data.get('author_email'),
+            'abstract': data.get('abstract'),
             'text': data.get('text'),
             'referees': data.get('referees', []),
             'history': []
@@ -359,7 +364,9 @@ class Manuscripts(Resource):
     def get(self):
         """Get all manuscripts"""
         try:
-            manuscripts = read('manuscripts')
+            manuscripts = read('manuscripts', no_id=False)
+            for manuscript in manuscripts:
+                manuscript['manu_id'] = str(manuscript['_id'])
             return manuscripts, HTTPStatus.OK
         except Exception as e:
             print(f"Error in get(): {e}")
@@ -367,12 +374,12 @@ class Manuscripts(Resource):
             HTTPStatus.INTERNAL_SERVER_ERROR
 
 
-@api.route(f'{MANU_EP}/<string:manu_id>')
+@api.route(f'{MANU_EP}/<string:id>')
 class ManuscriptById(Resource):
-    def delete(self, manu_id):
-        """Delete a manuscript by manu_id"""
+    def delete(self, id):
+        """Delete a manuscript by MongoDB _id"""
         try:
-            delete_count = delete('manuscripts', {'manu_id': manu_id})
+            delete_count = delete('manuscripts', {'_id': ObjectId(id)})
             if delete_count > 0:
                 return {'message': 'Manuscript deleted'}, HTTPStatus.OK
             else:
@@ -382,6 +389,20 @@ class ManuscriptById(Resource):
             print(f"Error in delete(): {e}")
             return {'message': 'Internal server error'},
             HTTPStatus.INTERNAL_SERVER_ERROR
+
+    def get(self, id):
+        """Retrieve a manuscript by MongoDB _id"""
+        try:
+            manuscript = fetch_one("manuscripts", {"_id": ObjectId(id)})
+            if manuscript:
+                return manuscript, HTTPStatus.OK
+            else:
+                return {'message': 'Manuscript not found'},
+                HTTPStatus.NOT_FOUND
+        except Exception as e:
+            print(f"Error in get(): {e}")
+            return {'message': 'Invalid ID format or internal server error'},
+            HTTPStatus.BAD_REQUEST
 
 
 text_model = api.model('Text', {
