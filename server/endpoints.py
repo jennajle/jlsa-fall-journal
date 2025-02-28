@@ -12,7 +12,7 @@ import data.roles as rls
 
 import data.people as ppl
 import data.manuscripts as manu
-from data.db_connect import create, read, delete
+from data.db_connect import create, read, delete, update, fetch_one
 
 app = Flask(__name__)
 CORS(app)
@@ -53,6 +53,7 @@ DATE_RESP = 'Date'
 DATE = '2024-10-02'
 PEOPLE_EP = '/people'
 MANU_EP = '/manuscripts'
+TEXT_EP = '/text'
 
 
 MESSAGE = 'Message'
@@ -379,5 +380,93 @@ class ManuscriptById(Resource):
                 HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in delete(): {e}")
+            return {'message': 'Internal server error'},
+            HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+text_model = api.model('Text', {
+    'title': fields.String(required=True, description="Text title"),
+    'content': fields.String(required=True, description="Content of the text"),
+})
+
+
+@api.route(TEXT_EP)
+class Texts(Resource):
+    @api.expect(text_model)
+    def post(self):
+        """Create a new text document"""
+        data = request.json
+        text_doc = {
+            'title': data.get('title'),
+            'content': data.get('content'),
+        }
+
+        result = create('texts', text_doc)
+        if result is not None:
+            return {'message': 'Text created'}, HTTPStatus.CREATED
+
+    def get(self):
+        """Get all text documents"""
+        try:
+            texts = read('texts')
+            return texts, HTTPStatus.OK
+        except Exception as e:
+            print(f"Error in get(): {e}")
+            return {'message': 'Internal server error'},
+            HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@api.route(f'{TEXT_EP}/<string:title>')
+class TextByTitle(Resource):
+    def get(self, title):
+        """Get the content of a text by title"""
+        try:
+            texts = read('texts')
+            text_doc = next((text for text in texts if text['title'] == title),
+                            None)
+            if text_doc:
+                return {
+                    'title': text_doc['title'], 'content': text_doc['content']
+                }, HTTPStatus.OK
+            else:
+                return {'message': 'Text not found'}, HTTPStatus.NOT_FOUND
+        except Exception as e:
+            print(f"Error in get(): {e}")
+            return {'message': 'Internal server error'},
+            HTTPStatus.INTERNAL_SERVER_ERROR
+
+    def delete(self, title):
+        """Delete a text by its title"""
+        try:
+            existing_text = fetch_one('texts', {'title': title})
+            if existing_text:
+                delete('texts', {'title': title})
+                return {'message': 'Text deleted successfully'},
+                HTTPStatus.OK
+            else:
+                return {'message': 'Text not found'}, HTTPStatus.NOT_FOUND
+        except Exception as e:
+            print(f"Error in delete(): {e}")
+            return {'message': 'Internal server error'},
+            HTTPStatus.INTERNAL_SERVER_ERROR
+
+    @api.expect(text_model)
+    def put(self, title):
+        """Update the content of a text by title"""
+        try:
+            existing_text = fetch_one('texts', {'title': title})
+            if existing_text:
+                new_content = request.json.get('content')
+                if new_content:
+                    update('texts', {'title': title}, {'content': new_content})
+                    return {'message': 'Text updated successfully'},
+                    HTTPStatus.OK
+                else:
+                    return {'message': 'New content not provided'},
+                    HTTPStatus.BAD_REQUEST
+            else:
+                return {'message': 'Text not found'}, HTTPStatus.NOT_FOUND
+        except Exception as e:
+            print(f"Error in put(): {e}")
             return {'message': 'Internal server error'},
             HTTPStatus.INTERNAL_SERVER_ERROR
