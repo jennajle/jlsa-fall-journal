@@ -105,7 +105,7 @@ def create_person(name: str, affiliation: str, email: str, roles: list):
 
 def update(name: str, affiliation: str, email: str, roles: list):
     if not exists(email):
-        raise ValueError(f'Updating non-existent person: {email=}')
+        raise ValueError(f'Updating non-existent person with email {email}')
     if is_valid_person(name, affiliation, email, roles=roles):
         ret = dbc.update(PEOPLE_COLLECT,
                          {EMAIL: email},
