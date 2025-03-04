@@ -166,13 +166,14 @@ def test_get_people_with_invalid_role(mock_is_valid):
     assert 'Invalid role' in resp_json['Message']
 
 
-@patch('data.manuscripts.handle_action', autospec=True,
-       return_value='SOME STRING')
-def test_handle_action(mock_read):
+@patch('data.manuscripts.handle_action', autospec=True)
+def test_handle_action(mock_handle_action):
+    mock_handle_action.return_value = {"new_state": "WIT"}
     resp = TEST_CLIENT.put(f'{ep.MANU_EP}/receive_action',
                            json={
-                               manu.MANU_ID: 'some id',
-                               manu.CURR_STATE: 'some state',
-                               manu.ACTION: 'some action',
+                               manu.MANU_ID: '67c7700a985d03e678e4513e',
+                               manu.CURR_STATE: 'SUB',
+                               manu.ACTION: 'WIT',
+                               manu.REFEREE: 'some ref',
                            })
     assert resp.status_code == OK
