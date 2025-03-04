@@ -319,14 +319,25 @@ class ReceiveAction(Resource):
             action = request.json.get(manu.ACTION)
             kwargs = {}
             kwargs[manu.REFEREE] = request.json.get(manu.REFEREE)
+
+            manuscript = fetch_one("manuscripts", {"_id": ObjectId(manu_id)})
+            if not manuscript:
+                raise ValueError("Manuscript not found")
+
+            history = manuscript.get("history", [])
             ret = manu.handle_action(
                 manu_id, curr_state, action, **kwargs)
+            new_state = ret.get("new_state")
+            history.append(curr_state)
+            update_res = update("manuscripts", {"_id": ObjectId(manu_id)},
+                                {"state": new_state, "history": history})
         except Exception as err:
             raise wz.NotAcceptable(f'Bad action: ' f'{err=}')
-        return {
-            MESSAGE: 'Action received!',
-            RETURN: ret,
-        }
+        if update_res:
+            return {
+                MESSAGE: 'Action received!',
+                RETURN: ret,
+            }
 
 
 manuscript_model = api.model('Manuscript', {
@@ -335,6 +346,7 @@ manuscript_model = api.model('Manuscript', {
                             description="Author of the manuscript"),
     'author_email': fields.String(required=True,
                                   description="Author of the manuscript"),
+    'state': fields.String(required=True, description="Current state"),
     'abstract': fields.String(required=True,
                               description="Manuscript abstract"),
     'text': fields.String(required=False,
@@ -356,6 +368,7 @@ class Manuscripts(Resource):
             'title': data.get('title'),
             'author': data.get('author'),
             'author_email': data.get('author_email'),
+            'state': data.get('state', 'SUB'),
             'abstract': data.get('abstract'),
             'text': data.get('text'),
             'referees': data.get('referees', []),
