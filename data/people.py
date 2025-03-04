@@ -91,11 +91,14 @@ def delete(email: str):
 
 def create_person(name: str, affiliation: str, email: str, roles: list):
     if exists(email):
-        raise ValueError(f'Adding duplicate {email=}')
+        raise ValueError(f'Person with email {email} already exists')
     if is_valid_person(name, affiliation, email, roles=roles):
-        person = {NAME: name, AFFILIATION: affiliation,
-                  EMAIL: email, ROLES: roles}
-        print(person)
+        person = {
+            NAME: name,
+            AFFILIATION: affiliation,
+            EMAIL: email,
+            ROLES: roles
+        }
         dbc.create(PEOPLE_COLLECT, person)
         return email
 

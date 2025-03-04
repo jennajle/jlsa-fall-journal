@@ -144,11 +144,11 @@ class People(Resource):
             return {MESSAGE:
                     'Person created successfully', 'Person': ret}, 201
         except ValueError as e:
-            return {MESSAGE: str(e)}, 406
+            api.abort(HTTPStatus.BAD_REQUEST, message=str(e))
 
     @api.doc('update_person')
     @api.expect(multi_role_person_model)
-    @api.response(200, 'Person created successfully')
+    @api.response(200, 'Person updated successfully')
     @api.response(400, 'Invalid input or person does not exist')
     @api.response(409, 'Another person already has this email')
     def put(self):
