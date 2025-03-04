@@ -278,6 +278,7 @@ def main():
 
     print("Editor Review")
     print(handle_action(TEST_ID, EDITOR_REV, ACCEPT))
+    print(handle_action(TEST_ID, EDITOR_REV, WITHDRAW))
 
     print("Copy Edit")
     print(handle_action(TEST_ID, COPY_EDIT, DONE))
