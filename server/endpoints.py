@@ -150,6 +150,7 @@ class People(Resource):
     @api.expect(multi_role_person_model)
     @api.response(200, 'Person created successfully')
     @api.response(400, 'Invalid input or person does not exist')
+    @api.response(409, 'Another person already has this email')
     def put(self):
         """
         This method updates an existing person.
@@ -157,16 +158,20 @@ class People(Resource):
         form_data = request.json
         name = form_data.get('name')
         affiliation = form_data.get('affiliation')
-        email = form_data.get('email')
+        new_email = form_data.get('email')
         roles = form_data.get('roles')
-        ret = ppl.update(name, affiliation, email, roles)
-        if ret is None:
-            return {MESSAGE:
-                    'Failed to create person, ' +
-                    'person may not exist yet!'
-                    }, 400
 
-        return {MESSAGE: 'Person updated successfully', 'Person': ret}, 200
+        # Check if no other person has new email
+        another_person = ppl.read_one(new_email)
+        if another_person:
+            raise wz.Conflict(
+                f"Another person already has the email {new_email}")
+
+        try:
+            ret = ppl.update(name, affiliation, new_email, roles)
+            return {MESSAGE: 'Person updated successfully', 'Person': ret}, 200
+        except ValueError as e:
+            raise wz.BadRequest(str(e))
 
 
 @api.route(f'{PEOPLE_EP}/<email>')
