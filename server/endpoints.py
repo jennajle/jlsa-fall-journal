@@ -374,20 +374,38 @@ class Manuscripts(Resource):
     def post(self):
         """Create a new manuscript"""
         data = request.json
-        manuscript = {
-            'title': data.get('title'),
-            'author': data.get('author'),
-            'author_email': data.get('author_email'),
-            'state': data.get('state', 'SUB'),
-            'abstract': data.get('abstract'),
-            'text': data.get('text'),
-            'referees': data.get('referees', []),
-            'history': []
-        }
 
-        result = create('manuscripts', manuscript)
-        return {'message': 'Manuscript created',
-                'id': str(result.inserted_id)}, HTTPStatus.CREATED
+        required_fields = ['title',
+                           'author', 'author_email',
+                           'abstract', 'text']
+        missing_fields = [field
+                          for field in required_fields
+                          if not data.get(field)]
+
+        if missing_fields:
+            raise wz.BadRequest(
+                f"Manuscript missing required fields: "
+                f"{', '.join(missing_fields)}"
+            )
+
+        try:
+            manuscript = {
+                'title': data.get('title'),
+                'author': data.get('author'),
+                'author_email': data.get('author_email'),
+                'state': data.get('state', 'SUB'),
+                'abstract': data.get('abstract'),
+                'text': data.get('text'),
+                'referees': data.get('referees', []),
+                'history': []
+            }
+
+            result = create('manuscripts', manuscript)
+            return {'message': 'Manuscript created',
+                    'id': str(result.inserted_id)}, HTTPStatus.CREATED
+        except Exception:
+            raise wz.InternalServerError(
+                "Failed to create manuscript due to a server error.")
 
     def get(self):
         """Get all manuscripts"""
@@ -397,9 +415,8 @@ class Manuscripts(Resource):
                 manuscript['manu_id'] = str(manuscript['_id'])
             return manuscripts, HTTPStatus.OK
         except Exception as e:
-            print(f"Error in get(): {e}")
-            return {'message': 'Internal server error'},
-            HTTPStatus.INTERNAL_SERVER_ERROR
+            raise wz.InternalServerError(
+                f"Error fetching manuscripts: {str(e)}")
 
 
 @api.route(f'{MANU_EP}/<string:id>')
