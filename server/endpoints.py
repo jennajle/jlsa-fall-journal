@@ -326,29 +326,31 @@ class ReceiveAction(Resource):
 
             # Get current history or initialize empty list
             history = manuscript.get("history", [])
-            
+
             # Pass the manuscript to handle_action
             kwargs['manu'] = manuscript
-            
+
             # Handle the action and get new state
             ret = manu.handle_action(manu_id, curr_state, action, **kwargs)
             new_state = ret.get("new_state")
-            
+
             # Add transition to history
             history.append({
                 'from': curr_state,
                 'action': action,
                 'to': new_state
             })
-            
+
             # Update manuscript with new state and history
-            update_res = update("manuscripts", 
-                              {"_id": ObjectId(manu_id)},
-                              {"state": new_state, "history": history})
-            
+            update_res = update(
+                "manuscripts",
+                {"_id": ObjectId(manu_id)},
+                {"state": new_state, "history": history}
+            )
+
             if not update_res:
                 raise ValueError("Failed to update manuscript state")
-                
+
             return {
                 MESSAGE: 'Action received!',
                 RETURN: ret,
@@ -359,19 +361,33 @@ class ReceiveAction(Resource):
 
 manuscript_model = api.model('Manuscript', {
     'title': fields.String(required=True, description="Manuscript title"),
-    'author': fields.String(required=True,
-                            description="Author of the manuscript"),
-    'author_email': fields.String(required=True,
-                                  description="Author of the manuscript"),
+    'author': fields.String(
+        required=True,
+        description="Author of the manuscript"
+    ),
+    'author_email': fields.String(
+        required=True,
+        description="Author of the manuscript"
+    ),
     'state': fields.String(required=True, description="Current state"),
-    'abstract': fields.String(required=True,
-                              description="Manuscript abstract"),
-    'text': fields.String(required=False,
-                          description="Content of the manuscript"),
-    'referees': fields.List(fields.String,
-                            description="List of referees", default=[]),
-    'history': fields.List(fields.Raw,
-                           description="Manuscript history", default=[]),
+    'abstract': fields.String(
+        required=True,
+        description="Manuscript abstract"
+    ),
+    'text': fields.String(
+        required=False,
+        description="Content of the manuscript"
+    ),
+    'referees': fields.List(
+        fields.String,
+        description="List of referees",
+        default=[]
+    ),
+    'history': fields.List(
+        fields.Raw,
+        description="Manuscript history",
+        default=[]
+    ),
 })
 
 
@@ -385,9 +401,9 @@ class Manuscripts(Resource):
             'title': data.get('title'),
             'author': data.get('author'),
             'author_email': data.get('author_email'),
-            'state': 'SUB',  
-            'abstract': data.get('abstract', ''),  
-            'text': data.get('text', ''),  
+            'state': 'SUB',
+            'abstract': data.get('abstract', ''),
+            'text': data.get('text', ''),
             'referees': data.get('referees', []),
             'history': [{
                 'from': None,
@@ -397,15 +413,18 @@ class Manuscripts(Resource):
         }
 
         # Validate required fields
-        if not manuscript['title'] or not manuscript['author'] or not manuscript['author_email']:
+        if not manuscript['title'] or not manuscript['author'] or \
+           not manuscript['author_email']:
             raise ValueError('Title, author, and author_email are required fields')
 
         result = create('manuscripts', manuscript)
         if result is None:
             raise ValueError('Failed to create manuscript')
-            
-        return {'message': 'Manuscript created',
-                'id': str(result['_id'])}, HTTPStatus.CREATED
+
+        return {
+            'message': 'Manuscript created',
+            'id': str(result['_id'])
+        }, HTTPStatus.CREATED
 
     def get(self):
         """Get all manuscripts"""
