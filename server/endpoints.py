@@ -153,7 +153,8 @@ class People(Resource):
     @api.response(409, 'Another person already has this email')
     def put(self):
         """
-        This method updates an existing person.
+        This method updates an existing person and
+        differentiates between old and new email.
         """
         form_data = request.json
         name = form_data.get('name')
