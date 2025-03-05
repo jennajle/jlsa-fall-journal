@@ -62,7 +62,7 @@ def test_handle_action_valid_return():
                                            manu=mqry.SAMPLE_MANU,
                                            referee='Some ref')
             print(f'{new_state=}')
-            assert mqry.is_valid_state(new_state)
+            assert mqry.is_valid_state(new_state['new_state'])
 
 #
 # def test_handle_action_empty_inputs():
