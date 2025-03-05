@@ -59,9 +59,14 @@ def connect_db():
 def create(collection, doc, db=SE_DB):
     """
     Insert a single doc into collection.
+    Returns the inserted document with its ID.
     """
     print(f'{db=}')
-    return client[db][collection].insert_one(doc)
+    result = client[db][collection].insert_one(doc)
+    if result.inserted_id:
+        doc['_id'] = result.inserted_id
+        return doc
+    return None
 
 
 def fetch_one(collection, filt, db=SE_DB):
@@ -85,7 +90,8 @@ def delete(collection: str, filt: dict, db=SE_DB):
 
 
 def update(collection, filters, update_dict, db=SE_DB):
-    return client[db][collection].update_one(filters, {'$set': update_dict})
+    result = client[db][collection].update_one(filters, {'$set': update_dict})
+    return result.modified_count > 0
 
 
 def read(collection, db=SE_DB, no_id=True) -> list:
@@ -95,7 +101,8 @@ def read(collection, db=SE_DB, no_id=True) -> list:
     ret = []
     for doc in client[db][collection].find():
         if no_id:
-            del doc[MONGO_ID]
+            if MONGO_ID in doc:
+                del doc[MONGO_ID]
         else:
             convert_mongo_id(doc)
         ret.append(doc)
