@@ -161,14 +161,23 @@ class People(Resource):
         new_email = form_data.get('email')
         roles = form_data.get('roles')
 
-        # Check if no other person has new email
-        another_person = ppl.read_one(new_email)
-        if another_person:
-            raise wz.Conflict(
-                f"Another person already has the email {new_email}")
+        # Old email from query parameters
+        old_email = request.args.get('old_email')
+
+        current_person = ppl.read_one(old_email)
+        if not current_person:
+            raise wz.BadRequest(f"No person found with email {old_email}")
+
+        # Check for duplicates
+        if new_email != old_email:
+            another_person = ppl.read_one(new_email)
+            if another_person:
+                raise wz.Conflict(
+                    f"Another person already has the email {new_email}"
+                )
 
         try:
-            ret = ppl.update(name, affiliation, new_email, roles)
+            ret = ppl.update(old_email, name, affiliation, new_email, roles)
             return {MESSAGE: 'Person updated successfully', 'Person': ret}, 200
         except ValueError as e:
             raise wz.BadRequest(str(e))

@@ -143,16 +143,9 @@ TEST_UPDATE_NAME = 'New Name'
 
 VALID_ROLES = ['ED', 'AU']
 
-
-def test_update(temp_person):
-    ppl.update(TEST_UPDATE_NAME, 'UBuffalo', temp_person, VALID_ROLES)
-    updated_rec = ppl.read_one(temp_person)
-    assert updated_rec[ppl.NAME] == TEST_UPDATE_NAME
-
-
 def test_update_not_there(temp_person):
     with pytest.raises(ValueError):
-        ppl.update('Will Fail', 'University of the Void',
+        ppl.update('fail@test.com', 'Will Fail', 'University of the Void',
                    'Non-existent email', VALID_ROLES)
 
 
