@@ -13,6 +13,7 @@ import data.roles as rls
 
 import data.people as ppl
 import data.manuscripts as manu
+import data.roles as rls
 from data.db_connect import create, read, delete, update, fetch_one
 
 app = Flask(__name__)
@@ -55,6 +56,7 @@ DATE = '2024-10-02'
 PEOPLE_EP = '/people'
 MANU_EP = '/manuscripts'
 TEXT_EP = '/text'
+ROLES_EP = '/roles'
 
 
 MESSAGE = 'Message'
@@ -536,3 +538,15 @@ class TextByTitle(Resource):
             print(f"Error in put(): {e}")
             return {'message': 'Internal server error'},
             HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@api.route(ROLES_EP)
+class Roles(Resource):
+    """
+    This class handles reading person roles.
+    """
+    def get(self):
+        """
+        Retrieve the journal person roles.
+        """
+        return rls.read()

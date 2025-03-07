@@ -25,8 +25,12 @@ MH_ROLES = [
 ]
 
 
-def get_roles() -> dict:
+def read() -> dict:
     return deepcopy(ROLES)
+
+
+def get_roles() -> dict:
+    return read()
 
 
 def get_masthead_roles() -> dict:
