@@ -9,11 +9,10 @@ from flask_restx import Resource, Api, fields
 from flask_cors import CORS
 from bson import ObjectId
 import werkzeug.exceptions as wz
-import data.roles as rls
 
+import data.roles as rls
 import data.people as ppl
 import data.manuscripts as manu
-import data.roles as rls
 from data.db_connect import create, read, delete, update, fetch_one
 
 app = Flask(__name__)
