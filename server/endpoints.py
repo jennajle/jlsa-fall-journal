@@ -314,22 +314,15 @@ MANU_ACTION_FLDS = api.model('ManuscriptAction', {
 
 @api.route(f'{MANU_EP}/receive_action')
 class ReceiveAction(Resource):
-    """
-    Receive an action for a manuscript.
-    """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
     @api.expect(MANU_ACTION_FLDS)
     def put(self):
-        """
-        Receive an action for a manuscript.
-        """
         try:
             manu_id = request.json.get(manu.MANU_ID)
             curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
-            kwargs = {}
-            kwargs[manu.REFEREE] = request.json.get(manu.REFEREE)
+            referee = request.json.get(manu.REFEREE)
 
             manuscript = fetch_one("manuscripts", {"_id": ObjectId(manu_id)})
             if not manuscript:
@@ -337,13 +330,21 @@ class ReceiveAction(Resource):
 
             history = manuscript.get("history", [])
             ret = manu.handle_action(
-                manu_id, curr_state, action, **kwargs)
+                manu_id, curr_state, action, manu=manuscript, referee=referee
+            )
             new_state = ret.get("new_state")
             history.append(curr_state)
-            update_res = update("manuscripts", {"_id": ObjectId(manu_id)},
-                                {"state": new_state, "history": history})
+            update_fields = {
+                "state": new_state,
+                "history": history,
+                "referees": manuscript.get("referees", [])
+            }
+            update_res = update(
+                "manuscripts", {"_id": ObjectId(manu_id)}, update_fields
+            )
+
         except Exception as err:
-            raise wz.NotAcceptable(f'Bad action: ' f'{err=}')
+            raise wz.NotAcceptable(f'Bad action: {err=}')
         if update_res:
             return {
                 MESSAGE: 'Action received!',

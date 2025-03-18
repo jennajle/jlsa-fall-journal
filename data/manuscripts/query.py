@@ -226,7 +226,10 @@ def reset_history(manuscript: dict):
 
 
 def handle_action(manu_id, curr_state, action, **kwargs) -> dict:
-    kwargs['manu'] = SAMPLE_MANU_W_REF
+    if 'manu' not in kwargs:
+        raise ValueError("Manuscript not provided")
+    manu_dict = kwargs['manu']
+
     if curr_state not in STATE_TABLE:
         raise ValueError(f'Bad state: {curr_state}')
     if action not in STATE_TABLE[curr_state]:
