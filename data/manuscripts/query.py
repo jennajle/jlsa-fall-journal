@@ -114,10 +114,10 @@ def assign_ref(manu: dict, referee: str, extra=None) -> str:
 def delete_ref(manu: dict, referee: str) -> str:
     if referee in manu[flds.REFEREES]:
         manu[REFEREES].remove(referee)
-    if len(manu[flds.REFEREES]) > 0:
-        return IN_REF_REV
-    else:
+    if len(manu[flds.REFEREES]) == 0:
         return SUBMITTED
+    else:
+        return IN_REF_REV
 
 # if kwargs is not added
 # test_handle_action_valid_return -

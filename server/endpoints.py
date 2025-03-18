@@ -314,6 +314,9 @@ MANU_ACTION_FLDS = api.model('ManuscriptAction', {
 
 @api.route(f'{MANU_EP}/receive_action')
 class ReceiveAction(Resource):
+    """
+    Receive an action for a manuscript.
+    """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
     @api.expect(MANU_ACTION_FLDS)
@@ -344,7 +347,7 @@ class ReceiveAction(Resource):
             )
 
         except Exception as err:
-            raise wz.NotAcceptable(f'Bad action: {err=}')
+            raise wz.NotAcceptable(f'Bad action: ' f'{err=}')
         if update_res:
             return {
                 MESSAGE: 'Action received!',
