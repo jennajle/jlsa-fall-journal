@@ -461,6 +461,32 @@ text_model = api.model('Text', {
 })
 
 
+@api.route(f"{MANU_EP}/<string:id>/available_actions")
+class ActionsForManuscript(Resource):
+    def get(self, id):
+        """Return actions specific to manuscript's current state"""
+        try:
+            manuscript = fetch_one("manuscripts", {"_id": ObjectId(id)})
+            if not manuscript:
+                raise ValueError("Manuscript not found")
+            return manu.get_available_actions(manuscript), HTTPStatus.OK
+        except Exception as e:
+            return {"message": str(e)}, HTTPStatus.BAD_REQUEST
+
+
+@api.route(f"{MANU_EP}/<string:id>/history")
+class ManuscriptHistory(Resource):
+    def get(self, id):
+        """Return the state history of manuscript"""
+        try:
+            manuscript = fetch_one("manuscripts", {"_id": ObjectId(id)})
+            if not manuscript:
+                raise ValueError("Manuscript not found")
+            return manu.get_history(manuscript), HTTPStatus.OK
+        except Exception as e:
+            return {"message": str(e)}, HTTPStatus.BAD_REQUEST
+
+
 @api.route(TEXT_EP)
 class Texts(Resource):
     @api.expect(text_model)
