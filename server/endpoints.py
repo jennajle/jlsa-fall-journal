@@ -15,6 +15,8 @@ import data.people as ppl
 import data.manuscripts as manu
 from data.db_connect import create, read, delete, update, fetch_one
 
+import subprocess  # Need for developer endpoint
+
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
@@ -579,3 +581,33 @@ class Roles(Resource):
         Retrieve the journal person roles.
         """
         return rls.read()
+
+
+LOG_DIR = '/var/log'
+DEV_LOG_EP = '/dev/logs'
+ELOG_LOC = '/var/log/sejutimannan.pythonanywhere.com.error.log'
+
+
+@api.route(DEV_LOG_EP)
+class DevLogs(Resource):
+    """
+    Developer-only endpoint to view the error log from Python Anywhere.
+    """
+    def get(self):
+        try:
+            # show last 50 lines of the error log file
+            result = subprocess.run(f'tail -n 50 {ELOG_LOC}', shell=True,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                    text=True)
+
+            if result.returncode != 0:
+                return {
+                    'message': 'Failed to read logs',
+                    'error': result.stderr.strip()
+                }, 500
+
+            return {'log_output': result.stdout.strip().split('\n')}, 200
+
+        except Exception as e:
+            return {'message': f'Error reading logs: {str(e)}'}, 500
