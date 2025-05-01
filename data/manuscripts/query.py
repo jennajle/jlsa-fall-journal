@@ -91,6 +91,31 @@ VALID_ACTIONS = [
     ACCEPT_REV,
 ]
 
+# used for the frontend display
+STATE_DISPLAY_NAMES = {
+    SUBMITTED: "Submitted",
+    IN_REF_REV: "In Referee Review",
+    AUTHOR_REVISIONS: "Author Revisions",
+    EDITOR_REV: "Editor Review",
+    COPY_EDIT: "Copy Editing",
+    AUTHOR_REVIEW: "Author Review",
+    FORMATTING: "Formatting",
+    WITHDRAWN: "Withdrawn",
+    REJECTED: "Rejected",
+    PUBLISHED: "Published",
+}
+
+ACTION_DISPLAY_NAMES = {
+    ASSIGN_REF: "Assign Referee",
+    DELETE_REF: "Delete Referee",
+    REJECT: "Reject",
+    WITHDRAW: "Withdraw",
+    DONE: "Done",
+    ACCEPT: "Accept",
+    ACCEPT_REV: "Accept with Revisions",
+}
+
+
 def get_actions() -> list:
     return VALID_ACTIONS
 
@@ -253,6 +278,13 @@ def get_available_actions(manu: dict):
     if state in STATE_TABLE:
         return list(STATE_TABLE[state].keys())
     return []
+
+# these are used for the front end
+def get_state_display_names():
+    return STATE_DISPLAY_NAMES
+
+def get_action_display_names():
+    return ACTION_DISPLAY_NAMES
 
 
 def main():

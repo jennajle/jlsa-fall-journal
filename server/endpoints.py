@@ -489,6 +489,18 @@ class ManuscriptHistory(Resource):
             return {"message": str(e)}, HTTPStatus.BAD_REQUEST
 
 
+@api.route(f'{MANU_EP}/metadata')
+class ManuscriptMetadata(Resource):
+    def get(self):
+        """
+        Return mappings of state and action codes for frontend display
+        """
+        return {
+            "state_names": manu.get_state_display_names(),
+            "action_names": manu.get_action_display_names()
+        }, HTTPStatus.OK
+
+
 @api.route(TEXT_EP)
 class Texts(Resource):
     @api.expect(text_model)
@@ -591,7 +603,7 @@ ELOG_LOC = '/var/log/sejutimannan.pythonanywhere.com.error.log'
 @api.route(DEV_LOG_EP)
 class DevLogs(Resource):
     """
-    Developer-only endpoint to view the error log from Python Anywhere.
+    Developer endpoint to view the error log from Python Anywhere.
     """
     def get(self):
         try:
