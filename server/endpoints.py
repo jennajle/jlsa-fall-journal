@@ -42,7 +42,7 @@ multi_role_person_model = api.model('MultiRolePerson', {
                                  default=''),
     'email': fields.String(required=True,
                            description='The email of the person'),
-    'password': fields.String(required=True, description='Password'),
+    'password': fields.String(description='Password', default=''),
 })
 
 ENDPOINT_EP = '/endpoints'
