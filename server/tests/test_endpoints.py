@@ -55,7 +55,8 @@ def test_create_person():
         'name': 'John Doe',
         'role': 'AU',
         'affiliation': 'NYU',
-        'email': 'johndoe@nyu.edu'
+        'email': 'johndoe@nyu.edu',
+        'password': 'password'
     }
 
     resp = TEST_CLIENT.post(ep.PEOPLE_EP, json=valid_person_data)

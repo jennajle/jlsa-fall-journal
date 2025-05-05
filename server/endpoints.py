@@ -9,6 +9,7 @@ from flask_restx import Resource, Api, fields
 from flask_cors import CORS
 from bson import ObjectId
 import werkzeug.exceptions as wz
+from werkzeug.security import generate_password_hash
 
 import data.roles as rls
 import data.people as ppl
@@ -41,6 +42,7 @@ multi_role_person_model = api.model('MultiRolePerson', {
                                  default=''),
     'email': fields.String(required=True,
                            description='The email of the person'),
+    'password': fields.String(required=True, description='Password'),
 })
 
 ENDPOINT_EP = '/endpoints'
@@ -143,7 +145,10 @@ class People(Resource):
             affiliation = form_data.get('affiliation')
             email = form_data.get('email')
             roles = form_data.get('roles')
-            ret = ppl.create_person(name, affiliation, email, roles)
+            password = form_data.get('password')
+            password_hash = generate_password_hash(password)
+            ret = ppl.create_person(name, affiliation, email,
+                                    roles, password_hash)
             return {MESSAGE:
                     'Person created successfully', 'Person': ret}, 201
         except ValueError as e:

@@ -89,7 +89,8 @@ def delete(email: str):
     return dbc.delete(PEOPLE_COLLECT, {EMAIL: email})
 
 
-def create_person(name: str, affiliation: str, email: str, roles: list):
+def create_person(name: str, affiliation: str, email: str,
+                  roles: list, password_hash: str):
     if exists(email):
         raise ValueError(f'Person with email {email} already exists')
     if is_valid_person(name, affiliation, email, roles=roles):
@@ -97,7 +98,8 @@ def create_person(name: str, affiliation: str, email: str, roles: list):
             NAME: name,
             AFFILIATION: affiliation,
             EMAIL: email,
-            ROLES: roles
+            ROLES: roles,
+            'password_hash': password_hash
         }
         dbc.create(PEOPLE_COLLECT, person)
         return email
