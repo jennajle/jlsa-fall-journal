@@ -42,7 +42,7 @@ multi_role_person_model = api.model('MultiRolePerson', {
                                  default=''),
     'email': fields.String(required=True,
                            description='The email of the person'),
-    'password': fields.String(description='Password', default=''),
+    'password': fields.String(required=False, description='Password'),
 })
 
 ENDPOINT_EP = '/endpoints'
@@ -146,7 +146,10 @@ class People(Resource):
             email = form_data.get('email')
             roles = form_data.get('roles')
             password = form_data.get('password')
-            password_hash = generate_password_hash(password)
+            if password:
+                password_hash = generate_password_hash(password)
+            else:
+                None
             ret = ppl.create_person(name, affiliation, email,
                                     roles, password_hash)
             return {MESSAGE:
