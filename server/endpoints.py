@@ -149,7 +149,7 @@ class People(Resource):
             if password:
                 password_hash = generate_password_hash(password)
             else:
-                None
+                password_hash = None
             ret = ppl.create_person(name, affiliation, email,
                                     roles, password_hash)
             return {MESSAGE:
