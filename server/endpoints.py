@@ -604,11 +604,11 @@ class Roles(Resource):
 
 
 LOG_DIR = '/var/log'
-DEV_LOG_EP = '/dev/logs'
+DEV_ERROR_LOG_EP = '/dev/error_logs'
 ELOG_LOC = '/var/log/sejutimannan.pythonanywhere.com.error.log'
 
 
-@api.route(DEV_LOG_EP)
+@api.route(DEV_ERROR_LOG_EP)
 class DevLogs(Resource):
     """
     Developer endpoint to view the error log from Python Anywhere.
