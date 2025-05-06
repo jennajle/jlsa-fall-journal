@@ -166,6 +166,19 @@ def test_get_people_with_invalid_role(mock_is_valid):
     assert resp.status_code == BAD_REQUEST
     assert 'Invalid role' in resp_json['Message']
 
+def test_people_search():
+    query = "Zendaya"
+    resp = TEST_CLIENT.get(f"{ep.PEOPLE_EP}/search?query={query}")
+
+    if resp.status_code == OK:
+        results = resp.get_json()
+        assert isinstance(results, dict)
+    elif resp.status_code == NOT_FOUND:
+        assert "No matching people found" in resp.get_json()["Message"]
+    elif resp.status_code == BAD_REQUEST:
+        assert "No search query" in resp.get_json()["Message"]
+
+
 
 # @patch('data.manuscripts.handle_action', autospec=True)
 # def test_handle_action(mock_handle_action):
