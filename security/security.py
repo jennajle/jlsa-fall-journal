@@ -73,17 +73,21 @@ TEST_USER_ID = 'test@nyu.edu'  # Add test user
 # Mock session storage - in real implementation, this would be in a database
 active_sessions = {}
 
+
 def create_session(user_id: str) -> str:
     """
     Creates a new session for a user and returns the session ID.
     In a real implementation, this would generate a secure session token.
     """
-    session_id = f"session_{user_id}_{len(active_sessions)}"
+    session_id = (
+        f"session_{user_id}_{len(active_sessions)}"  # Generate session ID
+    )
     active_sessions[session_id] = {
         'user_id': user_id,
-        'created_at': 'timestamp'  # In real implementation, use actual timestamp
+        'created_at': 'timestamp'  # Real implementation: use timestamp
     }
     return session_id
+
 
 def check_session(user_id: str, **kwargs) -> bool:
     """
@@ -91,13 +95,14 @@ def check_session(user_id: str, **kwargs) -> bool:
     """
     if 'session_id' not in kwargs:
         return False
-    
+
     session_id = kwargs['session_id']
     if session_id not in active_sessions:
         return False
-        
+
     session = active_sessions[session_id]
     return session['user_id'] == user_id
+
 
 def invalidate_session(session_id: str) -> bool:
     """
@@ -108,7 +113,10 @@ def invalidate_session(session_id: str) -> bool:
         return True
     return False
 
+
 security_recs = None
+
+
 # These will come from the DB soon:
 TEST_RECS = {
     PEOPLE: {
@@ -221,8 +229,9 @@ def read_feature(feature_name: str) -> dict:
 
 
 @needs_recs
-def is_permitted(feature_name: str, action: str,
-                 user_id: str, **kwargs) -> bool:
+def is_permitted(
+        feature_name: str, action: str, user_id: str, **kwargs
+) -> bool:
     prot = read_feature(feature_name)
     if prot is None:
         return True
