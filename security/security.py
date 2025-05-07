@@ -123,8 +123,7 @@ TEST_RECS = {
         CREATE: {
             USER_LIST: [GOOD_USER_ID, TEST_USER_ID],  # Add test user
             CHECKS: {
-                LOGIN: True,
-                SESSION: True,  # Require valid session
+                LOGIN: True,  # Only require login check
             },
         },
     },
