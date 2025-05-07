@@ -59,22 +59,71 @@ LOGIN = 'login'
 LOGIN_KEY = 'login_key'
 IP_ADDR = 'ip_address'
 DUAL_FACTOR = 'dual_factor'
+SESSION = 'session'  # New check type for session validation
 
 # Features:
 PEOPLE = 'people'
 BAD_FEATURE = 'baaaad feature'
+JOURNAL = 'journal'  # New feature for journal entries
 
 PEOPLE_MISSING_ACTION = READ
 GOOD_USER_ID = 'jl12631@nyu.edu'
+TEST_USER_ID = 'test@nyu.edu'  # Add test user
+
+# Mock session storage - in real implementation, this would be in a database
+active_sessions = {}
+
+
+def create_session(user_id: str) -> str:
+    """
+    Creates a new session for a user and returns the session ID.
+    In a real implementation, this would generate a secure session token.
+    """
+    session_id = (
+        f"session_{user_id}_{len(active_sessions)}"  # Generate session ID
+    )
+    active_sessions[session_id] = {
+        'user_id': user_id,
+        'created_at': 'timestamp'  # Real implementation: use timestamp
+    }
+    return session_id
+
+
+def check_session(user_id: str, **kwargs) -> bool:
+    """
+    Verifies if a user has a valid active session.
+    """
+    if 'session_id' not in kwargs:
+        return False
+
+    session_id = kwargs['session_id']
+    if session_id not in active_sessions:
+        return False
+
+    session = active_sessions[session_id]
+    return session['user_id'] == user_id
+
+
+def invalidate_session(session_id: str) -> bool:
+    """
+    Invalidates a user's session.
+    """
+    if session_id in active_sessions:
+        del active_sessions[session_id]
+        return True
+    return False
+
 
 security_recs = None
+
+
 # These will come from the DB soon:
 TEST_RECS = {
     PEOPLE: {
         CREATE: {
-            USER_LIST: [GOOD_USER_ID],
+            USER_LIST: [GOOD_USER_ID, TEST_USER_ID],  # Add test user
             CHECKS: {
-                LOGIN: True,
+                LOGIN: True,  # Only require login check
             },
         },
         DELETE: { # ADD TO USER LIST TO ALLOW DELETING
@@ -86,9 +135,39 @@ TEST_RECS = {
     },
     BAD_FEATURE: {
         CREATE: {
-            USER_LIST: [GOOD_USER_ID],
+            USER_LIST: [GOOD_USER_ID, TEST_USER_ID],  # Add test user
             CHECKS: {
                 'Bad check': True,
+            },
+        },
+    },
+    JOURNAL: {
+        CREATE: {
+            USER_LIST: [GOOD_USER_ID, TEST_USER_ID],  # Add test user
+            CHECKS: {
+                LOGIN: True,
+                SESSION: True,  # Require valid session
+            },
+        },
+        READ: {
+            USER_LIST: [GOOD_USER_ID, TEST_USER_ID],  # Add test user
+            CHECKS: {
+                LOGIN: True,
+                SESSION: True,  # Require valid session
+            },
+        },
+        UPDATE: {
+            USER_LIST: [GOOD_USER_ID, TEST_USER_ID],  # Add test user
+            CHECKS: {
+                LOGIN: True,
+                SESSION: True,  # Require valid session
+            },
+        },
+        DELETE: {
+            USER_LIST: [GOOD_USER_ID, TEST_USER_ID],  # Add test user
+            CHECKS: {
+                LOGIN: True,
+                SESSION: True,  # Require valid session
             },
         },
     },
@@ -122,6 +201,7 @@ CHECK_FUNCS = {
     LOGIN: check_login,
     IP_ADDR: check_ip,
     DUAL_FACTOR: dual_factor,
+    SESSION: check_session,  # Add session check to available checks
 }
 
 
@@ -154,8 +234,9 @@ def read_feature(feature_name: str) -> dict:
 
 
 @needs_recs
-def is_permitted(feature_name: str, action: str,
-                 user_id: str, **kwargs) -> bool:
+def is_permitted(
+        feature_name: str, action: str, user_id: str, **kwargs
+) -> bool:
     prot = read_feature(feature_name)
     if prot is None:
         return True
