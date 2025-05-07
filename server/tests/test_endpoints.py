@@ -131,7 +131,7 @@ def test_read(mock_read):
 def test_read_one(mock_read):
     email = 'mock_id'
     user_id = GOOD_USER_ID
-    resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/{email}/{user_id}')
+    resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/{email}')
     assert resp.status_code == OK
 
 @patch(PEOPLE_LOC + 'read_one', autospec=True, return_value=None)

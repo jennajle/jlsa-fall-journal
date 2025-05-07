@@ -197,21 +197,10 @@ class People(Resource):
 
 
 @api.route(f'{PEOPLE_EP}/<string:email>/<string:user_id>')
-class Person(Resource):
+class DeletePerson(Resource):
     """
-    Getting person does not need SECURITY check.
     Delete person with user SECURITY login check.
     """
-    def get(self, email, user_id):
-        """
-        Retrieve a journal person.
-        """
-        person = ppl.read_one(email)
-        if person:
-            return person
-        else:
-            raise wz.NotFound(f'No such record: {email}')
-
     @api.response(HTTPStatus.OK, 'Success.')
     @api.response(HTTPStatus.NOT_FOUND, 'No such person.')
     @api.response(HTTPStatus.FORBIDDEN, 'Not authorized.')
@@ -232,6 +221,19 @@ class Person(Resource):
             }, HTTPStatus.OK
         else:
             raise wz.NotFound(f'No such person: {email}')
+
+
+@api.route(f'{PEOPLE_EP}/<string:email>')
+class GetPerson(Resource):
+    """
+    Retrieve a journal person's info (no security).
+    """
+    def get(self, email):
+        person = ppl.read_one(email)
+        if person:
+            return person
+        else:
+            raise wz.NotFound(f'No such record: {email}')
 
 
 MASTHEAD = 'Masthead'
