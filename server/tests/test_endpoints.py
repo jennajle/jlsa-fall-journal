@@ -20,6 +20,7 @@ from data.people import NAME
 TEST_CLIENT = ep.app.test_client()
 
 PEOPLE_LOC = 'data.people.'
+from security.security import GOOD_USER_ID
 
 
 def test_hello():
@@ -108,8 +109,9 @@ def test_delete_person():
         'email': 'johndoe@nyu.edu'
     }
 
-    resp = TEST_CLIENT.delete(f"{ep.PEOPLE_EP}/johndoe@nyu.edu")
+    resp = TEST_CLIENT.delete(f"{ep.PEOPLE_EP}/{existing_person['email']}/{GOOD_USER_ID}")
     resp_json = resp.get_json()
+
     assert resp.status_code == OK
     assert 'Person deleted successfully' in resp_json['Message']
 
@@ -127,7 +129,9 @@ def test_read(mock_read):
 @patch(PEOPLE_LOC + 'read_one', autospec=True,
        return_value={NAME: 'Joe Schmoe'})
 def test_read_one(mock_read):
-    resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/mock_id')
+    email = 'mock_id'
+    user_id = GOOD_USER_ID
+    resp = TEST_CLIENT.get(f'{ep.PEOPLE_EP}/{email}/{user_id}')
     assert resp.status_code == OK
 
 @patch(PEOPLE_LOC + 'read_one', autospec=True, return_value=None)

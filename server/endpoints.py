@@ -17,6 +17,7 @@ import data.manuscripts as manu
 from data.db_connect import create, read, delete, update, fetch_one
 
 import subprocess  # Need for developer endpoint
+import security.security as sec
 
 app = Flask(__name__)
 CORS(app)
@@ -195,11 +196,15 @@ class People(Resource):
             raise wz.BadRequest(str(e))
 
 
-@api.route(f'{PEOPLE_EP}/<email>')
+@api.route(f'{PEOPLE_EP}/<string:email>/<string:user_id>')
 class Person(Resource):
-    def get(self, email):
+    """
+    Getting person does not need SECURITY check.
+    Delete person with user SECURITY login check.
+    """
+    def get(self, email, user_id):
         """
-        Retrieve a single person's info
+        Retrieve a journal person.
         """
         person = ppl.read_one(email)
         if person:
@@ -209,7 +214,13 @@ class Person(Resource):
 
     @api.response(HTTPStatus.OK, 'Success.')
     @api.response(HTTPStatus.NOT_FOUND, 'No such person.')
-    def delete(self, email):
+    @api.response(HTTPStatus.FORBIDDEN, 'Not authorized.')
+    def delete(self, email, user_id):
+        kwargs = {sec.LOGIN_KEY: 'any-login-key-for-now'}
+        if not sec.is_permitted(sec.PEOPLE, sec.DELETE, user_id, **kwargs):
+            raise wz.Forbidden(
+                'You do not have permission to delete this person.')
+
         ret = ppl.delete(email)
         if ret is not None:
             return {

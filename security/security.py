@@ -77,6 +77,12 @@ TEST_RECS = {
                 LOGIN: True,
             },
         },
+        DELETE: { # ADD TO USER LIST TO ALLOW DELETING
+            USER_LIST: [GOOD_USER_ID, 'sejutinm@gmail.com'],
+            CHECKS: {
+                LOGIN: True,
+            },
+        },
     },
     BAD_FEATURE: {
         CREATE: {
