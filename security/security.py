@@ -78,7 +78,8 @@ TEST_RECS = {
             },
         },
         DELETE: {
-            USER_LIST: [GOOD_USER_ID, 'sejutinm@gmail.com'],
+            USER_LIST: [GOOD_USER_ID,
+                        'sejutinm@gmail.com', 'songziyileo@gmail.com'],
             CHECKS: {
                 LOGIN: True,
             },
