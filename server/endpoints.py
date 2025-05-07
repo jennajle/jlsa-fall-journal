@@ -67,32 +67,32 @@ MESSAGE = 'Message'
 RETURN = 'return'
 
 
-@api.route(HELLO_EP)
-class HelloWorld(Resource):
-    """
-    The purpose of the HelloWorld class is to have a simple test to see if the
-    app is working at all.
-    """
-    def get(self):
-        """
-        A trivial endpoint to see if the server is running.
-        It just answers with "hello world."
-        """
-        return {HELLO_RESP: 'world'}
+# @api.route(HELLO_EP)
+# class HelloWorld(Resource):
+#     """
+#     The purpose of the HelloWorld class is to have a simple test
+#     to see if the app is working at all.
+#     """
+#     def get(self):
+#         """
+#         A trivial endpoint to see if the server is running.
+#         It just answers with "hello world."
+#         """
+#         return {HELLO_RESP: 'world'}
 
 
-@api.route(ENDPOINT_EP)
-class Endpoints(Resource):
-    """
-    This class will serve as live, fetchable documentation of what endpoints
-    are available in the system.
-    """
-    def get(self):
-        """
-        The `get()` method will return a list of available endpoints.
-        """
-        endpoints = sorted(rule.rule for rule in api.app.url_map.iter_rules())
-        return {"Available endpoints": endpoints}
+# @api.route(ENDPOINT_EP)
+# class Endpoints(Resource):
+#     """
+#     This class will serve as live, fetchable documentation of
+#     what endpoints are available in the system.
+#     """
+#     def get(self):
+#         """
+#         The `get()` method will return a list of available endpoints.
+#         """
+#         endpoints = sorted(rule.rule for r in api.app.url_map.iter_rules())
+#         return {"Available endpoints": endpoints}
 
 
 @api.route(TITLE_EP)
@@ -216,6 +216,9 @@ class Person(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'No such person.')
     @api.response(HTTPStatus.FORBIDDEN, 'Not authorized.')
     def delete(self, email, user_id):
+        """
+        Delete a person from email and user id
+        """
         kwargs = {sec.LOGIN_KEY: 'any-login-key-for-now'}
         if not sec.is_permitted(sec.PEOPLE, sec.DELETE, user_id, **kwargs):
             raise wz.Forbidden(
@@ -237,6 +240,9 @@ MASTHEAD = 'Masthead'
 @api.route(f'{PEOPLE_EP}/masthead')
 class Masthead(Resource):
     def get(self):
+        """
+        Returns the journal masthead.
+        """
         return {MASTHEAD: ppl.get_masthead()}
 
 
@@ -309,22 +315,6 @@ class RolePeople(Resource):
         return {role: people}, 200
 
 
-@api.route(f"{PEOPLE_EP}/search")
-class PersonSearch(Resource):
-    def get(self):
-        """
-        Search for people based on query parameters (name, email, or role).
-        """
-        query = request.args.get("query")
-        if not query:
-            return {MESSAGE: "No search query"}, HTTPStatus.BAD_REQUEST
-        results = ppl.search(query)
-        if not results:
-            return {MESSAGE: "No matching people found"}, HTTPStatus.NOT_FOUND
-
-        return results, HTTPStatus.OK
-
-
 MANU_ACTION_FLDS = api.model('ManuscriptAction', {
     manu.MANU_ID: fields.String,
     manu.CURR_STATE: fields.String,
@@ -335,13 +325,13 @@ MANU_ACTION_FLDS = api.model('ManuscriptAction', {
 
 @api.route(f'{MANU_EP}/receive_action')
 class ReceiveAction(Resource):
-    """
-    Receive an action for a manuscript.
-    """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
     @api.expect(MANU_ACTION_FLDS)
     def put(self):
+        """
+        Receive an action for a manuscript.
+        """
         try:
             manu_id = request.json.get(manu.MANU_ID)
             curr_state = request.json.get(manu.CURR_STATE)
@@ -621,10 +611,10 @@ ELOG_LOC = '/var/log/sejutimannan.pythonanywhere.com.error.log'
 
 @api.route(DEV_ERROR_LOG_EP)
 class DevLogs(Resource):
-    """
-    Developer endpoint to view the error log from Python Anywhere.
-    """
     def get(self):
+        """
+        Developer endpoint to view the error log from Python Anywhere.
+        """
         try:
             # show last 50 lines of the error log file
             result = subprocess.run(f'tail -n 50 {ELOG_LOC}', shell=True,
