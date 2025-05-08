@@ -79,6 +79,7 @@ DELETE_REF = 'DRF'
 WITHDRAW = 'WIT'
 ACCEPT = 'ACC'
 ACCEPT_REV = 'ACR'
+SUBMIT_REVIEW = 'SRV'
 # for testing:
 TEST_ACTION = ACCEPT
 
@@ -90,6 +91,7 @@ VALID_ACTIONS = [
     DELETE_REF,
     ACCEPT,
     ACCEPT_REV,
+    SUBMIT_REVIEW,
 ]
 
 # used for the frontend display
@@ -114,6 +116,7 @@ ACTION_DISPLAY_NAMES = {
     DONE: "Done",
     ACCEPT: "Accept",
     ACCEPT_REV: "Accept with Revisions",
+    SUBMIT_REVIEW: "Submit Review",
 }
 
 
@@ -185,6 +188,9 @@ STATE_TABLE = {
         },
         ACCEPT_REV: {
             FUNC: lambda **kwargs: AUTHOR_REVISIONS,
+        },
+        SUBMIT_REVIEW: {
+            FUNC: lambda **kwargs: IN_REF_REV
         },
         **COMMON_ACTIONS,
     },
@@ -293,7 +299,7 @@ def filter_actions_by_roles(actions, role_codes):
         "Consulting Editor": {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
         "Managing Editor": {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
         "Author": {WITHDRAW, DONE},
-        "Referee": {}, # NEED TO ADD SUBMIT REVIEW
+        "Referee": {SUBMIT_REVIEW},
     }
 
     allowed = set()
