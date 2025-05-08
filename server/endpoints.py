@@ -126,16 +126,18 @@ class People(Resource):
         try:
             people = ppl.read()
             if not people:
-                return {}, 200  # Return empty instead of error
-            return people, 200
+                return {}, HTTPStatus.OK  # Return empty instead of error
+            return people, HTTPStatus.OK
         except Exception as e:
             print(f"Error in get(): {e}")
-            return {MESSAGE: 'Internal server error'}, 500
+            return ({MESSAGE: 'Internal server error'},
+                    HTTPStatus.INTERNAL_SERVER_ERROR)
 
     @api.doc('create_person')
     @api.expect(multi_role_person_model)
-    @api.response(201, 'Person created successfully')
-    @api.response(400, 'Invalid input or person already exists')
+    @api.response(HTTPStatus.CREATED, 'Person created successfully')
+    @api.response(HTTPStatus.BAD_REQUEST,
+                  'Invalid input or person already exists')
     def post(self):
         """
         This method creates a new person.
@@ -153,16 +155,18 @@ class People(Resource):
                 password_hash = None
             ret = ppl.create_person(name, affiliation, email,
                                     roles, password_hash)
-            return {MESSAGE:
-                    'Person created successfully', 'Person': ret}, 201
+            return ({MESSAGE:
+                    'Person created successfully', 'Person': ret},
+                    HTTPStatus.CREATED)
         except ValueError as e:
             api.abort(HTTPStatus.BAD_REQUEST, message=str(e))
 
     @api.doc('update_person')
     @api.expect(multi_role_person_model)
-    @api.response(200, 'Person updated successfully')
-    @api.response(400, 'Invalid input or person does not exist')
-    @api.response(409, 'Another person already has this email')
+    @api.response(HTTPStatus.OK, 'Person updated successfully')
+    @api.response(HTTPStatus.BAD_REQUEST,
+                  'Invalid input or person does not exist')
+    @api.response(HTTPStatus.CREATED, 'Another person already has this email')
     def put(self):
         """
         This method updates an existing person and
@@ -191,7 +195,8 @@ class People(Resource):
 
         try:
             ret = ppl.update(old_email, name, affiliation, new_email, roles)
-            return {MESSAGE: 'Person updated successfully', 'Person': ret}, 200
+            return ({MESSAGE: 'Person updated successfully', 'Person': ret},
+                    HTTPStatus.OK)
         except ValueError as e:
             raise wz.BadRequest(str(e))
 
@@ -264,9 +269,9 @@ class RoleManagement(Resource):
                 MESSAGE: (
                     f"Role {role} added successfully "
                     f"to person with email {_id}")
-            }, 200
+            }, HTTPStatus.OK
         except ValueError as e:
-            return {MESSAGE: str(e)}, 400
+            return {MESSAGE: str(e)}, HTTPStatus.BAD_REQUEST
 
     def delete(self, _id, role=None):
         """
@@ -284,16 +289,16 @@ class RoleManagement(Resource):
                     MESSAGE: (
                         f"Role {role} removed successfully "
                         f"from person with email {_id}")
-                }, 200
+                }, HTTPStatus.OK
             else:
                 ppl.clear_roles(_id)
                 return {
                     MESSAGE: (
                         f"All roles removed successfully "
                         f"from person with email {_id}")
-                }, 200
+                }, HTTPStatus.OK
         except ValueError as e:
-            return {MESSAGE: str(e)}, 400
+            return {MESSAGE: str(e)}, HTTPStatus.BAD_REQUEST
 
 
 @api.route(f'{PEOPLE_EP}/roles/<role>')
@@ -303,7 +308,7 @@ class RolePeople(Resource):
         This method retrieves all people with a specific role
         """
         if not rls.is_valid(role):
-            return {MESSAGE: f'Invalid role: {role}'}, 400
+            return {MESSAGE: f'Invalid role: {role}'}, HTTPStatus.BAD_REQUEST
 
         people = []
         for person in ppl.read().values():
@@ -312,9 +317,10 @@ class RolePeople(Resource):
                 people.append(person)
 
         if not people:
-            return {
-                MESSAGE: f'No people found with role: {role}'}, 404
-        return {role: people}, 200
+            return ({
+                MESSAGE: f'No people found with role: {role}'},
+                    HTTPStatus.NOT_FOUND)
+        return {role: people}, HTTPStatus.OK
 
 
 MANU_ACTION_FLDS = api.model('ManuscriptAction', {
@@ -646,9 +652,11 @@ class DevLogs(Resource):
                 return {
                     'message': 'Failed to read logs',
                     'error': result.stderr.strip()
-                }, 500
+                }, HTTPStatus.INTERNAL_SERVER_ERROR
 
-            return {'log_output': result.stdout.strip().split('\n')}, 200
+            return ({'log_output': result.stdout.strip().split('\n')},
+                    HTTPStatus.OK)
 
         except Exception as e:
-            return {'message': f'Error reading logs: {str(e)}'}, 500
+            return ({'message': f'Error reading logs: {str(e)}'},
+                    HTTPStatus.INTERNAL_SERVER_ERROR)
