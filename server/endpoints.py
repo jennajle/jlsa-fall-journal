@@ -479,7 +479,7 @@ class ActionsForManuscript(Resource):
                                                         role_codes)
             return role_actions, HTTPStatus.OK
         except Exception as e:
-            return {"message": str(e)}, HTTPStatus.BAD_REQUEST
+            return {MESSAGE: str(e)}, HTTPStatus.BAD_REQUEST
 
 
 @api.route(f"{MANU_EP}/<string:id>/history")
@@ -492,7 +492,7 @@ class ManuscriptHistory(Resource):
                 raise ValueError("Manuscript not found")
             return manu.get_history(manuscript), HTTPStatus.OK
         except Exception as e:
-            return {"message": str(e)}, HTTPStatus.BAD_REQUEST
+            return {MESSAGE: str(e)}, HTTPStatus.BAD_REQUEST
 
 
 @api.route(f'{MANU_EP}/metadata')
