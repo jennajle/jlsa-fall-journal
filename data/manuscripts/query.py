@@ -1,5 +1,5 @@
 import data.manuscripts.fields as flds
-from data.roles import ROLES
+import data.roles as rls
 
 ACTION = 'action'
 AUTHOR = 'author'
@@ -117,6 +117,14 @@ ACTION_DISPLAY_NAMES = {
     ACCEPT: "Accept",
     ACCEPT_REV: "Accept with Revisions",
     SUBMIT_REVIEW: "Submit Review",
+}
+
+ROLE_PERMISSIONS = {
+    rls.ED_CODE: {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
+    rls.CE_CODE: {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
+    rls.ME_CODE: {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
+    rls.AUTHOR_CODE: {WITHDRAW, DONE},
+    rls.RE_CODE: {SUBMIT_REVIEW},
 }
 
 
@@ -293,18 +301,9 @@ def get_action_display_names():
     return ACTION_DISPLAY_NAMES
 
 def filter_actions_by_roles(actions, role_codes):
-    role_names = [ROLES.get(code) for code in role_codes if code in ROLES]
-    role_permissions = {
-        "Editor": {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
-        "Consulting Editor": {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
-        "Managing Editor": {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
-        "Author": {WITHDRAW, DONE},
-        "Referee": {SUBMIT_REVIEW},
-    }
-
     allowed = set()
-    for name in role_names:
-        allowed.update(role_permissions.get(name, []))
+    for code in role_codes:
+        allowed.update(ROLE_PERMISSIONS.get(code, []))
 
     return [action for action in actions if action in allowed]
 

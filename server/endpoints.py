@@ -489,10 +489,18 @@ class ActionsForManuscript(Resource):
                 raise wz.NotFound(f"No user found with email: {email}")
 
             role_codes = user.get("roles", [])
-            all_actions = manu.get_available_actions(manuscript)
+            available_actions = manu.get_available_actions(manuscript)
 
-            return (manu.filter_actions_by_roles(all_actions, role_codes),
-                    HTTPStatus.OK)
+            # check if current user is author of manuscript
+            if ((rls.AUTHOR_CODE in role_codes) and
+                    (manuscript.get(manu.AUTHOR_EMAIL) != email)):
+                author_only = manu.ROLE_PERMISSIONS.get(rls.AUTHOR_CODE, set())
+                available_actions = [action for action in available_actions
+                                     if action not in author_only]
+
+            role_actions = manu.filter_actions_by_roles(available_actions,
+                                                        role_codes)
+            return (role_actions, HTTPStatus.OK)
         except Exception as e:
             return {"message": str(e)}, HTTPStatus.BAD_REQUEST
 
