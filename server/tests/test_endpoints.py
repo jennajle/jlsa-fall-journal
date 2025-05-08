@@ -54,7 +54,7 @@ def test_get_people():
 def test_create_person():
     valid_person_data = {
         'name': 'John Doe',
-        'role': 'AU',
+        'role': ['AU'],
         'affiliation': 'NYU',
         'email': 'johndoe@nyu.edu',
         'password': 'password'
@@ -109,7 +109,7 @@ def test_delete_person():
         'email': 'johndoe@nyu.edu'
     }
 
-    resp = TEST_CLIENT.delete(f"{ep.PEOPLE_EP}/{existing_person['email']}/{GOOD_USER_ID}")
+    resp = TEST_CLIENT.delete(f"/people/delete/{existing_person['email']}/{GOOD_USER_ID}")
     resp_json = resp.get_json()
 
     assert resp.status_code == OK

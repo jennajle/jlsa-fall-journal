@@ -1,4 +1,5 @@
 import data.manuscripts.fields as flds
+from data.roles import ROLES
 
 ACTION = 'action'
 AUTHOR = 'author'
@@ -279,12 +280,27 @@ def get_available_actions(manu: dict):
         return list(STATE_TABLE[state].keys())
     return []
 
-# these are used for the front end
 def get_state_display_names():
     return STATE_DISPLAY_NAMES
 
 def get_action_display_names():
     return ACTION_DISPLAY_NAMES
+
+def filter_actions_by_roles(actions, role_codes):
+    role_names = [ROLES.get(code) for code in role_codes if code in ROLES]
+    role_permissions = {
+        "Editor": {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
+        "Consulting Editor": {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
+        "Managing Editor": {ASSIGN_REF, DELETE_REF, DONE, REJECT, ACCEPT, ACCEPT_REV},
+        "Author": {WITHDRAW, DONE},
+        "Referee": {}, # NEED TO ADD SUBMIT REVIEW
+    }
+
+    allowed = set()
+    for name in role_names:
+        allowed.update(role_permissions.get(name, []))
+
+    return [action for action in actions if action in allowed]
 
 
 def main():

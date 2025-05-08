@@ -196,7 +196,7 @@ class People(Resource):
             raise wz.BadRequest(str(e))
 
 
-@api.route(f'{PEOPLE_EP}/<string:email>/<string:user_id>')
+@api.route(f'{PEOPLE_EP}/delete/<string:email>/<string:user_id>')
 class DeletePerson(Resource):
     """
     Delete person with user SECURITY login check.
@@ -477,12 +477,22 @@ text_model = api.model('Text', {
 @api.route(f"{MANU_EP}/<string:id>/available_actions")
 class ActionsForManuscript(Resource):
     def get(self, id):
-        """Return actions specific to manuscript's current state"""
+        """Return actions specific to manuscript's state and user role"""
         try:
             manuscript = fetch_one("manuscripts", {"_id": ObjectId(id)})
             if not manuscript:
                 raise ValueError("Manuscript not found")
-            return manu.get_available_actions(manuscript), HTTPStatus.OK
+
+            email = request.args.get("user_id")
+            user = ppl.read_one(email)
+            if not user:
+                raise wz.NotFound(f"No user found with email: {email}")
+
+            role_codes = user.get("roles", [])
+            all_actions = manu.get_available_actions(manuscript)
+
+            return (manu.filter_actions_by_roles(all_actions, role_codes),
+                    HTTPStatus.OK)
         except Exception as e:
             return {"message": str(e)}, HTTPStatus.BAD_REQUEST
 
