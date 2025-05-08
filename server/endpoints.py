@@ -1,5 +1,5 @@
 """
-This is the file containing all of the endpoints for our flask app.
+This is the file containing all the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
 from http import HTTPStatus
@@ -62,37 +62,8 @@ MANU_EP = '/manuscripts'
 TEXT_EP = '/text'
 ROLES_EP = '/roles'
 
-
 MESSAGE = 'Message'
 RETURN = 'return'
-
-
-# @api.route(HELLO_EP)
-# class HelloWorld(Resource):
-#     """
-#     The purpose of the HelloWorld class is to have a simple test
-#     to see if the app is working at all.
-#     """
-#     def get(self):
-#         """
-#         A trivial endpoint to see if the server is running.
-#         It just answers with "hello world."
-#         """
-#         return {HELLO_RESP: 'world'}
-
-
-# @api.route(ENDPOINT_EP)
-# class Endpoints(Resource):
-#     """
-#     This class will serve as live, fetchable documentation of
-#     what endpoints are available in the system.
-#     """
-#     def get(self):
-#         """
-#         The `get()` method will return a list of available endpoints.
-#         """
-#         endpoints = sorted(rule.rule for r in api.app.url_map.iter_rules())
-#         return {"Available endpoints": endpoints}
 
 
 @api.route(TITLE_EP)
@@ -425,7 +396,7 @@ class Manuscripts(Resource):
             }
 
             result = create('manuscripts', manuscript)
-            return {'message': 'Manuscript created',
+            return {MESSAGE: 'Manuscript created',
                     'id': str(result.inserted_id)}, HTTPStatus.CREATED
         except Exception:
             raise wz.InternalServerError(
@@ -450,14 +421,14 @@ class ManuscriptById(Resource):
         try:
             delete_count = delete('manuscripts', {'_id': ObjectId(id)})
             if delete_count > 0:
-                return {'message': 'Manuscript deleted'}, HTTPStatus.OK
+                return {MESSAGE: 'Manuscript deleted'}, HTTPStatus.OK
             else:
-                return {'message': 'Manuscript not found'},
-                HTTPStatus.NOT_FOUND
+                return ({MESSAGE: 'Manuscript not found'},
+                        HTTPStatus.NOT_FOUND)
         except Exception as e:
             print(f"Error in delete(): {e}")
-            return {'message': 'Internal server error'},
-            HTTPStatus.INTERNAL_SERVER_ERROR
+            return ({MESSAGE: 'Internal server error'},
+                    HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def get(self, id):
         """Retrieve a manuscript by MongoDB _id"""
@@ -466,12 +437,12 @@ class ManuscriptById(Resource):
             if manuscript:
                 return manuscript, HTTPStatus.OK
             else:
-                return {'message': 'Manuscript not found'},
-                HTTPStatus.NOT_FOUND
+                return ({MESSAGE: 'Manuscript not found'},
+                        HTTPStatus.NOT_FOUND)
         except Exception as e:
             print(f"Error in get(): {e}")
-            return {'message': 'Invalid ID format or internal server error'},
-            HTTPStatus.BAD_REQUEST
+            return ({MESSAGE: 'Invalid ID format or internal server error'},
+                    HTTPStatus.BAD_REQUEST)
 
 
 text_model = api.model('Text', {
@@ -506,7 +477,7 @@ class ActionsForManuscript(Resource):
 
             role_actions = manu.filter_actions_by_roles(available_actions,
                                                         role_codes)
-            return (role_actions, HTTPStatus.OK)
+            return role_actions, HTTPStatus.OK
         except Exception as e:
             return {"message": str(e)}, HTTPStatus.BAD_REQUEST
 
@@ -549,7 +520,7 @@ class Texts(Resource):
 
         result = create('texts', text_doc)
         if result is not None:
-            return {'message': 'Text created'}, HTTPStatus.CREATED
+            return {MESSAGE: 'Text created'}, HTTPStatus.CREATED
 
     def get(self):
         """Get all text documents"""
@@ -558,8 +529,8 @@ class Texts(Resource):
             return texts, HTTPStatus.OK
         except Exception as e:
             print(f"Error in get(): {e}")
-            return {'message': 'Internal server error'},
-            HTTPStatus.INTERNAL_SERVER_ERROR
+            return ({MESSAGE: 'Internal server error'},
+                    HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 @api.route(f'{TEXT_EP}/<string:title>')
@@ -575,11 +546,11 @@ class TextByTitle(Resource):
                     'title': text_doc['title'], 'content': text_doc['content']
                 }, HTTPStatus.OK
             else:
-                return {'message': 'Text not found'}, HTTPStatus.NOT_FOUND
+                return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in get(): {e}")
-            return {'message': 'Internal server error'},
-            HTTPStatus.INTERNAL_SERVER_ERROR
+            return ({MESSAGE: 'Internal server error'},
+                    HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def delete(self, title):
         """Delete a text by its title"""
@@ -587,14 +558,14 @@ class TextByTitle(Resource):
             existing_text = fetch_one('texts', {'title': title})
             if existing_text:
                 delete('texts', {'title': title})
-                return {'message': 'Text deleted successfully'},
-                HTTPStatus.OK
+                return ({MESSAGE: 'Text deleted successfully'},
+                        HTTPStatus.OK)
             else:
-                return {'message': 'Text not found'}, HTTPStatus.NOT_FOUND
+                return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in delete(): {e}")
-            return {'message': 'Internal server error'},
-            HTTPStatus.INTERNAL_SERVER_ERROR
+            return ({MESSAGE: 'Internal server error'},
+                    HTTPStatus.INTERNAL_SERVER_ERROR)
 
     @api.expect(text_model)
     def put(self, title):
@@ -605,17 +576,17 @@ class TextByTitle(Resource):
                 new_content = request.json.get('content')
                 if new_content:
                     update('texts', {'title': title}, {'content': new_content})
-                    return {'message': 'Text updated successfully'},
-                    HTTPStatus.OK
+                    return ({MESSAGE: 'Text updated successfully'},
+                            HTTPStatus.OK)
                 else:
-                    return {'message': 'New content not provided'},
-                    HTTPStatus.BAD_REQUEST
+                    return ({MESSAGE: 'New content not provided'},
+                            HTTPStatus.BAD_REQUEST)
             else:
-                return {'message': 'Text not found'}, HTTPStatus.NOT_FOUND
+                return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in put(): {e}")
-            return {'message': 'Internal server error'},
-            HTTPStatus.INTERNAL_SERVER_ERROR
+            return ({MESSAGE: 'Internal server error'},
+                    HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 @api.route(ROLES_EP)
@@ -650,7 +621,7 @@ class DevLogs(Resource):
 
             if result.returncode != 0:
                 return {
-                    'message': 'Failed to read logs',
+                    MESSAGE: 'Failed to read logs',
                     'error': result.stderr.strip()
                 }, HTTPStatus.INTERNAL_SERVER_ERROR
 
@@ -658,5 +629,5 @@ class DevLogs(Resource):
                     HTTPStatus.OK)
 
         except Exception as e:
-            return ({'message': f'Error reading logs: {str(e)}'},
+            return ({MESSAGE: f'Error reading logs: {str(e)}'},
                     HTTPStatus.INTERNAL_SERVER_ERROR)
