@@ -65,6 +65,7 @@ ROLES_EP = '/roles'
 MESSAGE = 'Message'
 RETURN = 'return'
 MSG_INTERNAL_ERROR = 'Internal server error'
+MSG_NOT_FOUND = 'Not found'
 
 
 @api.route(TITLE_EP)
@@ -193,7 +194,7 @@ class DeletePerson(Resource):
     Delete person with user SECURITY login check.
     """
     @api.response(HTTPStatus.OK, 'Success.')
-    @api.response(HTTPStatus.NOT_FOUND, 'No such person.')
+    @api.response(HTTPStatus.NOT_FOUND, MSG_NOT_FOUND)
     @api.response(HTTPStatus.FORBIDDEN, 'Not authorized.')
     def delete(self, email, user_id):
         """
@@ -343,7 +344,7 @@ class ReceiveAction(Resource):
             role_codes = user.get("roles", [])
             manuscript = fetch_one("manuscripts", {"_id": ObjectId(manu_id)})
             if not manuscript:
-                raise ValueError("Manuscript not found")
+                raise ValueError(MSG_NOT_FOUND)
 
             # Check if user is authorized to perform this action
             available_actions = manu.get_available_actions(manuscript)
@@ -458,7 +459,7 @@ class ManuscriptById(Resource):
             if delete_count > 0:
                 return {MESSAGE: 'Manuscript deleted'}, HTTPStatus.OK
             else:
-                return ({MESSAGE: 'Manuscript not found'},
+                return ({MESSAGE: MSG_NOT_FOUND},
                         HTTPStatus.NOT_FOUND)
         except Exception as e:
             print(f"Error in delete(): {e}")
@@ -472,7 +473,7 @@ class ManuscriptById(Resource):
             if manuscript:
                 return manuscript, HTTPStatus.OK
             else:
-                return ({MESSAGE: 'Manuscript not found'},
+                return ({MESSAGE: MSG_NOT_FOUND},
                         HTTPStatus.NOT_FOUND)
         except Exception as e:
             print(f"Error in get(): {e}")
@@ -493,7 +494,7 @@ class ActionsForManuscript(Resource):
         try:
             manuscript = fetch_one("manuscripts", {"_id": ObjectId(id)})
             if not manuscript:
-                raise ValueError("Manuscript not found")
+                raise ValueError(MSG_NOT_FOUND)
 
             email = request.args.get("user_id")
             user = ppl.read_one(email)
@@ -524,7 +525,7 @@ class ManuscriptHistory(Resource):
         try:
             manuscript = fetch_one("manuscripts", {"_id": ObjectId(id)})
             if not manuscript:
-                raise ValueError("Manuscript not found")
+                raise ValueError(MSG_NOT_FOUND)
             return manu.get_history(manuscript), HTTPStatus.OK
         except Exception as e:
             return {MESSAGE: str(e)}, HTTPStatus.BAD_REQUEST
@@ -581,7 +582,7 @@ class TextByTitle(Resource):
                     'title': text_doc['title'], 'content': text_doc['content']
                 }, HTTPStatus.OK
             else:
-                return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
+                return {MESSAGE: MSG_NOT_FOUND}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in get(): {e}")
             return ({MESSAGE: MSG_INTERNAL_ERROR},
@@ -596,7 +597,7 @@ class TextByTitle(Resource):
                 return ({MESSAGE: 'Text deleted successfully'},
                         HTTPStatus.OK)
             else:
-                return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
+                return {MESSAGE: MSG_NOT_FOUND}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in delete(): {e}")
             return ({MESSAGE: MSG_INTERNAL_ERROR},
@@ -617,7 +618,7 @@ class TextByTitle(Resource):
                     return ({MESSAGE: 'New content not provided'},
                             HTTPStatus.BAD_REQUEST)
             else:
-                return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
+                return {MESSAGE: MSG_NOT_FOUND}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in put(): {e}")
             return ({MESSAGE: MSG_INTERNAL_ERROR},
