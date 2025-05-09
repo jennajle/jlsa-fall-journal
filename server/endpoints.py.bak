@@ -73,7 +73,6 @@ class JournalTitle(Resource):
     This class handles creating, reading, updating
     and deleting the journal title.
     """
-
     def get(self):
         """
         This method provides the title, editor names,
@@ -92,7 +91,6 @@ class People(Resource):
     This class handles creating, reading, updating
     and deleting journal people.
     """
-
     def get(self):
         """
         This method lists all persons.
@@ -124,9 +122,7 @@ class People(Resource):
             roles = form_data.get('roles')
             password = form_data.get('password')
             if password:
-                password_hash = generate_password_hash(
-                    password, method='pbkdf2:sha256'
-                )
+                password_hash = generate_password_hash(password)
             else:
                 password_hash = None
             ret = ppl.create_person(name, affiliation, email,
@@ -209,7 +205,6 @@ class GetPerson(Resource):
     """
     Retrieve a journal person's info (no security).
     """
-
     def get(self, email):
         person = ppl.read_one(email)
         if person:
@@ -296,7 +291,7 @@ class RolePeople(Resource):
         if not people:
             return ({
                 MESSAGE: f'No people found with role: {role}'},
-                HTTPStatus.NOT_FOUND)
+                    HTTPStatus.NOT_FOUND)
         return {role: people}, HTTPStatus.OK
 
 
@@ -432,7 +427,7 @@ class Manuscripts(Resource):
 
             # Editors can see all manuscripts
             if any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
+                    for role in user_roles):
                 filtered_manuscripts = manuscripts
             # Authors can only see their own manuscripts
             elif rls.AUTHOR_CODE in user_roles:
@@ -472,7 +467,7 @@ class ManuscriptById(Resource):
 
         user_roles = user.get('roles', [])
         if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
+                    for role in user_roles):
             raise wz.Forbidden('Only editors can delete manuscripts')
 
         try:
@@ -508,7 +503,7 @@ class ManuscriptById(Resource):
 
             # Editors can see all manuscripts
             if any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
+                    for role in user_roles):
                 return manuscript, HTTPStatus.OK
             # Authors can only see their own manuscripts
             elif (rls.AUTHOR_CODE in user_roles and
@@ -549,7 +544,7 @@ class ManuscriptById(Resource):
 
             # Only editors can edit manuscripts
             if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                       for role in user_roles):
+                        for role in user_roles):
                 raise wz.Forbidden('Only editors can edit manuscripts')
 
             # Update manuscript fields
@@ -557,7 +552,7 @@ class ManuscriptById(Resource):
             update_fields = {}
 
             for field in ['title', 'author', 'author_email', 'state',
-                          'abstract', 'text', 'referees']:
+                         'abstract', 'text', 'referees']:
                 if field in update_data:
                     update_fields[field] = update_data[field]
 
@@ -601,12 +596,12 @@ class ActionsForManuscript(Resource):
             # check if current user is author of manuscript
             if ((rls.AUTHOR_CODE in role_codes) and
                     (manuscript.get(manu.AUTHOR_EMAIL) != email)):
-                author_only = manu.ROLE_PERMISSIONS.get(rls.AUTHOR_CODE, set())
-                available_actions = [action for action in available_actions
-                                     if action not in author_only]
+                    author_only = manu.ROLE_PERMISSIONS.get(rls.AUTHOR_CODE, set())
+                    available_actions = [action for action in available_actions
+                                       if action not in author_only]
 
-            role_actions = manu.filter_actions_by_roles(available_actions,
-                                                        role_codes)
+                role_actions = manu.filter_actions_by_roles(available_actions,
+                                                          role_codes)
             return role_actions, HTTPStatus.OK
         except Exception as e:
             return {MESSAGE: str(e)}, HTTPStatus.BAD_REQUEST
@@ -653,7 +648,7 @@ class Texts(Resource):
 
         user_roles = user.get('roles', [])
         if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
+                    for role in user_roles):
             raise wz.Forbidden('Only editors can create text documents')
 
         data = request.json
@@ -682,7 +677,7 @@ class Texts(Resource):
         except Exception as e:
             print(f"Error in get(): {e}")
             return ({MESSAGE: MSG_INTERNAL_ERROR},
-                    HTTPStatus.INTERNAL_SERVER_ERROR)
+                      HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 @api.route(f'{TEXT_EP}/<string:title>')
@@ -700,18 +695,18 @@ class TextByTitle(Resource):
         try:
             texts = read('texts')
             text_doc = next((text for text in texts if text['title'] == title),
-                            None)
+                              None)
             if text_doc:
                 return {
-                    'title': text_doc['title'],
-                    'content': text_doc['content']
+                      'title': text_doc['title'],
+                      'content': text_doc['content']
                 }, HTTPStatus.OK
             else:
                 return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in get(): {e}")
             return ({MESSAGE: MSG_INTERNAL_ERROR},
-                    HTTPStatus.INTERNAL_SERVER_ERROR)
+                      HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def delete(self, title):
         """Delete a text by its title"""
@@ -726,7 +721,7 @@ class TextByTitle(Resource):
 
         user_roles = user.get('roles', [])
         if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
+                    for role in user_roles):
             raise wz.Forbidden('Only editors can delete text documents')
 
         try:
@@ -734,13 +729,13 @@ class TextByTitle(Resource):
             if existing_text:
                 delete('texts', {'title': title})
                 return ({MESSAGE: 'Text deleted successfully'},
-                        HTTPStatus.OK)
+                          HTTPStatus.OK)
             else:
                 return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in delete(): {e}")
             return ({MESSAGE: MSG_INTERNAL_ERROR},
-                    HTTPStatus.INTERNAL_SERVER_ERROR)
+                      HTTPStatus.INTERNAL_SERVER_ERROR)
 
     @api.expect(text_model)
     def put(self, title):
@@ -756,7 +751,7 @@ class TextByTitle(Resource):
 
         user_roles = user.get('roles', [])
         if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
+                    for role in user_roles):
             raise wz.Forbidden('Only editors can update text documents')
 
         try:
@@ -783,7 +778,6 @@ class Roles(Resource):
     """
     This class handles reading person roles.
     """
-
     def get(self):
         """
         Retrieve the journal person roles.
