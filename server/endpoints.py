@@ -115,6 +115,18 @@ class People(Resource):
         This method creates a new person.
         """
         try:
+            # Extract user ID from query string
+            user_id = request.args.get("user_id")
+            if not user_id:
+                raise wz.Forbidden("Missing user ID")
+
+            user = ppl.read_one(user_id)
+            if not user:
+                raise wz.Forbidden("Invalid user ID")
+
+            if 'ED' not in user.get('roles', []):
+                raise wz.Forbidden("Only editors can create new people")
+
             form_data = request.json
             name = form_data.get('name')
             affiliation = form_data.get('affiliation')

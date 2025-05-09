@@ -15,7 +15,9 @@ import pytest
 import server.endpoints as ep
 
 import data.manuscripts as manu
+import data.people as ppl
 from data.people import NAME
+from werkzeug.security import generate_password_hash
 
 TEST_CLIENT = ep.app.test_client()
 
@@ -52,17 +54,26 @@ def test_get_people():
         assert False, f"Unexpected status code: {resp.status_code}"
 
 def test_create_person():
-    valid_person_data = {
+    ppl.delete('testeditor@gmail.com') # in case already created
+    ppl.create_person('Editor', 'Organization',
+                      'testeditor@gmail.com', ['ED'],
+                      generate_password_hash('pw'))
+
+    new_person_data = {
         'name': 'John Doe',
-        'role': ['AU'],
+        'roles': ['AU'],
         'affiliation': 'NYU',
         'email': 'johndoe@nyu.edu',
         'password': 'password'
     }
 
-    resp = TEST_CLIENT.post(ep.PEOPLE_EP, json=valid_person_data)
-    resp_json = resp.get_json()
+    resp = TEST_CLIENT.post(
+        f"{ep.PEOPLE_EP}?user_id=testeditor@gmail.com",
+        json=new_person_data
+    )
+
     assert resp.status_code == CREATED
+    resp_json = resp.get_json()
     assert 'Person created successfully' in resp_json['Message']
 
 
