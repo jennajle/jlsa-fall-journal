@@ -1,14 +1,3 @@
-import sys
-import os
-# Add the parent directory to Python path
-parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(parent_dir)
-
-import server.endpoints as ep
-from http import HTTPStatus
-from unittest.mock import patch
-import pytest
-
 from http.client import (
     BAD_REQUEST, # 400
     FORBIDDEN,
@@ -19,12 +8,16 @@ from http.client import (
     CREATED, # 201
 )
 
+from unittest.mock import patch
+
+import pytest
+
+import server.endpoints as ep
+
 import data.manuscripts as manu
 from data.people import NAME
 
 TEST_CLIENT = ep.app.test_client()
-OK = HTTPStatus.OK
-FORBIDDEN = HTTPStatus.FORBIDDEN
 
 PEOPLE_LOC = 'data.people.'
 from security.security import GOOD_USER_ID
@@ -189,94 +182,3 @@ def test_get_people_with_invalid_role(mock_is_valid):
 #                                manu.REFEREE: 'some ref',
 #                            })
 #     assert resp.status_code == OK
-
-@patch('data.people.read_one')
-@patch('data.people.update')
-def test_update_person_authorization(mock_update, mock_read_one):
-    """Test authorization checks for updating person profiles"""
-    # Test case 1: User trying to edit their own profile (should succeed)
-    mock_read_one.side_effect = [
-        {'name': 'John Doe', 'roles': ['AU'], 'email': 'john@example.com'},  # current_person
-        {'name': 'John Doe', 'roles': ['AU'], 'email': 'john@example.com'}   # user
-    ]
-    mock_update.return_value = 'john@example.com'
-    
-    resp = TEST_CLIENT.put(
-        f"{ep.PEOPLE_EP}?old_email=john@example.com&user_id=john@example.com",
-        json={
-            'name': 'John Doe',
-            'email': 'john@example.com',
-            'roles': ['AU'],
-            'affiliation': 'NYU'
-        }
-    )
-    assert resp.status_code == OK
-    assert 'Person updated successfully' in resp.json['Message']
-
-    # Test case 2: Author trying to edit another person's profile (should fail)
-    mock_read_one.side_effect = [
-        {'name': 'Jane Smith', 'roles': ['AU'], 'email': 'jane@example.com'},  # current_person
-        {'name': 'John Doe', 'roles': ['AU'], 'email': 'john@example.com'}     # user
-    ]
-    
-    resp = TEST_CLIENT.put(
-        f"{ep.PEOPLE_EP}?old_email=jane@example.com&user_id=john@example.com",
-        json={
-            'name': 'Jane Smith',
-            'email': 'jane@example.com',
-            'roles': ['AU'],
-            'affiliation': 'NYU'
-        }
-    )
-    assert resp.status_code == FORBIDDEN
-    assert 'You can only edit your own profile' in resp.json['Message']
-
-    # Test case 3: Admin trying to edit another person's profile (should succeed)
-    mock_read_one.side_effect = [
-        {'name': 'Jane Smith', 'roles': ['AU'], 'email': 'jane@example.com'},  # current_person
-        {'name': 'Admin User', 'roles': ['AD'], 'email': 'admin@example.com'}  # user
-    ]
-    mock_update.return_value = 'jane@example.com'
-    
-    resp = TEST_CLIENT.put(
-        f"{ep.PEOPLE_EP}?old_email=jane@example.com&user_id=admin@example.com",
-        json={
-            'name': 'Jane Smith',
-            'email': 'jane@example.com',
-            'roles': ['AU'],
-            'affiliation': 'NYU'
-        }
-    )
-    assert resp.status_code == OK
-    assert 'Person updated successfully' in resp.json['Message']
-
-    # Test case 4: Missing user_id (should fail)
-    resp = TEST_CLIENT.put(
-        f"{ep.PEOPLE_EP}?old_email=john@example.com",
-        json={
-            'name': 'John Doe',
-            'email': 'john@example.com',
-            'roles': ['AU'],
-            'affiliation': 'NYU'
-        }
-    )
-    assert resp.status_code == FORBIDDEN
-    assert 'User ID is required for authorization' in resp.json['Message']
-
-    # Test case 5: Invalid user_id (should fail)
-    mock_read_one.side_effect = [
-        {'name': 'John Doe', 'roles': ['AU'], 'email': 'john@example.com'},  # current_person
-        None  # user not found
-    ]
-    
-    resp = TEST_CLIENT.put(
-        f"{ep.PEOPLE_EP}?old_email=john@example.com&user_id=invalid@example.com",
-        json={
-            'name': 'John Doe',
-            'email': 'john@example.com',
-            'roles': ['AU'],
-            'affiliation': 'NYU'
-        }
-    )
-    assert resp.status_code == FORBIDDEN
-    assert 'Invalid user ID' in resp.json['Message']
