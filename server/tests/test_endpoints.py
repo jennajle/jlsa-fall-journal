@@ -74,7 +74,7 @@ def test_create_person():
 
     assert resp.status_code == CREATED
     resp_json = resp.get_json()
-    assert 'Person created successfully' in resp_json['Message']
+    assert ep.MSG_CREATED in resp_json['Message']
 
 
 @patch('data.people.read_one',  autospec=True, return_value={
@@ -124,7 +124,7 @@ def test_delete_person():
     resp_json = resp.get_json()
 
     assert resp.status_code == OK
-    assert 'Person deleted successfully' in resp_json['Message']
+    assert ep.MSG_DELETED in resp_json['Message']
 
 @patch(PEOPLE_LOC + 'read', autospec=True,
        return_value={'id': {NAME: 'Joe Schmoe'}})

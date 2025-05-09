@@ -67,6 +67,7 @@ RETURN = 'return'
 MSG_INTERNAL_ERROR = 'Internal server error'
 MSG_NOT_FOUND = 'Not found'
 MSG_DELETED = 'Deleted successfully'
+MSG_CREATED = 'Created successfully'
 
 
 @api.route(TITLE_EP)
@@ -109,7 +110,7 @@ class People(Resource):
 
     @api.doc('create_person')
     @api.expect(multi_role_person_model)
-    @api.response(HTTPStatus.CREATED, 'Person created successfully')
+    @api.response(HTTPStatus.CREATED, MSG_CREATED)
     @api.response(HTTPStatus.BAD_REQUEST,
                   'Invalid input or person already exists')
     def post(self):
@@ -144,7 +145,7 @@ class People(Resource):
             ret = ppl.create_person(name, affiliation, email,
                                     roles, password_hash)
             return ({MESSAGE:
-                    'Person created successfully', 'Person': ret},
+                    MSG_CREATED, 'Person': ret},
                     HTTPStatus.CREATED)
         except ValueError as e:
             api.abort(HTTPStatus.BAD_REQUEST, message=str(e))
@@ -433,7 +434,7 @@ class Manuscripts(Resource):
             }
 
             result = create('manuscripts', manuscript)
-            return {MESSAGE: 'Manuscript created',
+            return {MESSAGE: MSG_CREATED,
                     'id': str(result.inserted_id)}, HTTPStatus.CREATED
         except Exception:
             raise wz.InternalServerError(
@@ -557,7 +558,7 @@ class Texts(Resource):
 
         result = create('texts', text_doc)
         if result is not None:
-            return {MESSAGE: 'Text created'}, HTTPStatus.CREATED
+            return {MESSAGE: MSG_CREATED}, HTTPStatus.CREATED
 
     def get(self):
         """Get all text documents"""
