@@ -64,6 +64,7 @@ ROLES_EP = '/roles'
 
 MESSAGE = 'Message'
 RETURN = 'return'
+MSG_INTERNAL_ERROR = 'Internal server error'
 
 
 @api.route(TITLE_EP)
@@ -101,7 +102,7 @@ class People(Resource):
             return people, HTTPStatus.OK
         except Exception as e:
             print(f"Error in get(): {e}")
-            return ({MESSAGE: 'Internal server error'},
+            return ({MESSAGE: MSG_INTERNAL_ERROR},
                     HTTPStatus.INTERNAL_SERVER_ERROR)
 
     @api.doc('create_person')
@@ -427,7 +428,7 @@ class ManuscriptById(Resource):
                         HTTPStatus.NOT_FOUND)
         except Exception as e:
             print(f"Error in delete(): {e}")
-            return ({MESSAGE: 'Internal server error'},
+            return ({MESSAGE: MSG_INTERNAL_ERROR},
                     HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def get(self, id):
@@ -529,7 +530,7 @@ class Texts(Resource):
             return texts, HTTPStatus.OK
         except Exception as e:
             print(f"Error in get(): {e}")
-            return ({MESSAGE: 'Internal server error'},
+            return ({MESSAGE: MSG_INTERNAL_ERROR},
                     HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
@@ -549,7 +550,7 @@ class TextByTitle(Resource):
                 return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in get(): {e}")
-            return ({MESSAGE: 'Internal server error'},
+            return ({MESSAGE: MSG_INTERNAL_ERROR},
                     HTTPStatus.INTERNAL_SERVER_ERROR)
 
     def delete(self, title):
@@ -564,7 +565,7 @@ class TextByTitle(Resource):
                 return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in delete(): {e}")
-            return ({MESSAGE: 'Internal server error'},
+            return ({MESSAGE: MSG_INTERNAL_ERROR},
                     HTTPStatus.INTERNAL_SERVER_ERROR)
 
     @api.expect(text_model)
@@ -585,7 +586,7 @@ class TextByTitle(Resource):
                 return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
         except Exception as e:
             print(f"Error in put(): {e}")
-            return ({MESSAGE: 'Internal server error'},
+            return ({MESSAGE: MSG_INTERNAL_ERROR},
                     HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
