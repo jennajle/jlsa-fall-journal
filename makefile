@@ -16,9 +16,12 @@ github: FORCE
 	git push origin master
 
 all_tests: FORCE
-	cd $(API_DIR); make tests
-	cd $(DB_DIR); make tests
-	cd $(SEC_DIR); make tests
+	PYTHONPATH=$(shell pwd) cd $(API_DIR); make tests
+	PYTHONPATH=$(shell pwd) cd $(DB_DIR); make tests
+	PYTHONPATH=$(shell pwd) cd $(SEC_DIR); make tests
+
+# Alias for alltests to point to all_tests
+alltests: all_tests
 
 dev_env: FORCE
 	pip install -r $(REQ_DIR)/requirements-dev.txt

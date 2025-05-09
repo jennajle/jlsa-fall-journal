@@ -122,7 +122,9 @@ class People(Resource):
             roles = form_data.get('roles')
             password = form_data.get('password')
             if password:
-                password_hash = generate_password_hash(password)
+                password_hash = generate_password_hash(
+                    password, method='pbkdf2:sha256'
+                )
             else:
                 password_hash = None
             ret = ppl.create_person(name, affiliation, email,
@@ -307,21 +309,39 @@ MANU_ACTION_FLDS = api.model('ManuscriptAction', {
 class ReceiveAction(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.response(HTTPStatus.FORBIDDEN, 'Not authorized')
     @api.expect(MANU_ACTION_FLDS)
     def put(self):
         """
         Receive an action for a manuscript.
+        Only editors can perform editing actions.
         """
         try:
             manu_id = request.json.get(manu.MANU_ID)
             curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
             referee = request.json.get(manu.REFEREE)
+            user_id = request.args.get("user_id")
 
+            # Get user and check permissions
+            user = ppl.read_one(user_id)
+            if not user:
+                raise wz.NotFound(f"No user found with email: {user_id}")
+
+            role_codes = user.get("roles", [])
             manuscript = fetch_one("manuscripts", {"_id": ObjectId(manu_id)})
             if not manuscript:
                 raise ValueError("Manuscript not found")
 
+            # Check if user is authorized to perform this action
+            available_actions = manu.get_available_actions(manuscript)
+            role_actions = manu.filter_actions_by_roles(
+                available_actions, role_codes
+            )
+            if action not in role_actions:
+                raise wz.Forbidden(
+                    "You are not authorized to perform this action"
+                )
             history = manuscript.get("history", [])
             ret = manu.handle_action(
                 manu_id, curr_state, action, manu=manuscript, referee=referee
@@ -337,8 +357,10 @@ class ReceiveAction(Resource):
                 "manuscripts", {"_id": ObjectId(manu_id)}, update_fields
             )
 
+        except wz.Forbidden as err:
+            raise err
         except Exception as err:
-            raise wz.NotAcceptable(f'Bad action: ' f'{err=}')
+            raise wz.NotAcceptable(f'Bad action: {err=}')
         if update_res:
             return {
                 MESSAGE: 'Action received!',
