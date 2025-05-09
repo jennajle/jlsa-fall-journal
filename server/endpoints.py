@@ -66,6 +66,7 @@ MESSAGE = 'Message'
 RETURN = 'return'
 MSG_INTERNAL_ERROR = 'Internal server error'
 MSG_NOT_FOUND = 'Not found'
+MSG_DELETED = 'Deleted successfully'
 
 
 @api.route(TITLE_EP)
@@ -208,7 +209,7 @@ class DeletePerson(Resource):
         ret = ppl.delete(email)
         if ret is not None:
             return {
-                MESSAGE: 'Person deleted successfully',
+                MESSAGE: MSG_DELETED,
                 'Deleted': ret
             }, HTTPStatus.OK
         else:
@@ -457,7 +458,7 @@ class ManuscriptById(Resource):
         try:
             delete_count = delete('manuscripts', {'_id': ObjectId(id)})
             if delete_count > 0:
-                return {MESSAGE: 'Manuscript deleted'}, HTTPStatus.OK
+                return {MESSAGE: MSG_DELETED}, HTTPStatus.OK
             else:
                 return ({MESSAGE: MSG_NOT_FOUND},
                         HTTPStatus.NOT_FOUND)
@@ -594,7 +595,7 @@ class TextByTitle(Resource):
             existing_text = fetch_one('texts', {'title': title})
             if existing_text:
                 delete('texts', {'title': title})
-                return ({MESSAGE: 'Text deleted successfully'},
+                return ({MESSAGE: MSG_DELETED},
                         HTTPStatus.OK)
             else:
                 return {MESSAGE: MSG_NOT_FOUND}, HTTPStatus.NOT_FOUND
