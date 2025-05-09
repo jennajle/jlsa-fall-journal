@@ -9,7 +9,7 @@ from flask_restx import Resource, Api, fields
 from flask_cors import CORS
 from bson import ObjectId
 import werkzeug.exceptions as wz
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import data.roles as rls
 import data.people as ppl
@@ -122,7 +122,7 @@ class People(Resource):
             roles = form_data.get('roles')
             password = form_data.get('password')
             if password:
-                password_hash = generate_password_hash(password)
+                password_hash = generate_password_hash(password, method='pbkdf2:sha256')
             else:
                 password_hash = None
             ret = ppl.create_person(name, affiliation, email,
@@ -131,14 +131,14 @@ class People(Resource):
                     'Person created successfully', 'Person': ret},
                     HTTPStatus.CREATED)
         except ValueError as e:
-            api.abort(HTTPStatus.BAD_REQUEST, message=str(e))
+            return {MESSAGE: str(e)}, HTTPStatus.BAD_REQUEST
 
     @api.doc('update_person')
     @api.expect(multi_role_person_model)
     @api.response(HTTPStatus.OK, 'Person updated successfully')
-    @api.response(HTTPStatus.BAD_REQUEST,
-                  'Invalid input or person does not exist')
+    @api.response(HTTPStatus.BAD_REQUEST, 'Invalid input or person does not exist')
     @api.response(HTTPStatus.CREATED, 'Another person already has this email')
+    @api.response(HTTPStatus.FORBIDDEN, 'Not authorized to edit this profile')
     def put(self):
         """
         This method updates an existing person and
@@ -152,25 +152,39 @@ class People(Resource):
 
         # Old email from query parameters
         old_email = request.args.get('old_email')
+        # Get the user_id (email) of the person making the request
+        user_id = request.args.get('user_id')
+
+        if not user_id:
+            return {MESSAGE: 'User ID is required for authorization'}, HTTPStatus.FORBIDDEN
 
         current_person = ppl.read_one(old_email)
         if not current_person:
-            raise wz.BadRequest(f"No person found with email {old_email}")
+            return {MESSAGE: f"No person found with email {old_email}"}, HTTPStatus.BAD_REQUEST
+
+        # Get the roles of the user making the request
+        user = ppl.read_one(user_id)
+        if not user:
+            return {MESSAGE: 'Invalid user ID'}, HTTPStatus.FORBIDDEN
+
+        user_roles = user.get('roles', [])
+        
+        # Only allow users to edit their own profile unless they are an admin
+        if user_id != old_email and 'AD' not in user_roles:
+            return {MESSAGE: 'You can only edit your own profile'}, HTTPStatus.FORBIDDEN
 
         # Check for duplicates
         if new_email != old_email:
             another_person = ppl.read_one(new_email)
             if another_person:
-                raise wz.Conflict(
-                    f"Another person already has the email {new_email}"
-                )
+                return {MESSAGE: f"Another person already has the email {new_email}"}, HTTPStatus.CONFLICT
 
         try:
             ret = ppl.update(old_email, name, affiliation, new_email, roles)
             return ({MESSAGE: 'Person updated successfully', 'Person': ret},
                     HTTPStatus.OK)
         except ValueError as e:
-            raise wz.BadRequest(str(e))
+            return {MESSAGE: str(e)}, HTTPStatus.BAD_REQUEST
 
 
 @api.route(f'{PEOPLE_EP}/delete/<string:email>/<string:user_id>')
