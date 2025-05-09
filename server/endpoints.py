@@ -73,7 +73,6 @@ class JournalTitle(Resource):
     This class handles creating, reading, updating
     and deleting the journal title.
     """
-
     def get(self):
         """
         This method provides the title, editor names,
@@ -92,7 +91,6 @@ class People(Resource):
     This class handles creating, reading, updating
     and deleting journal people.
     """
-
     def get(self):
         """
         This method lists all persons.
@@ -124,9 +122,7 @@ class People(Resource):
             roles = form_data.get('roles')
             password = form_data.get('password')
             if password:
-                password_hash = generate_password_hash(
-                    password, method='pbkdf2:sha256'
-                )
+                password_hash = generate_password_hash(password)
             else:
                 password_hash = None
             ret = ppl.create_person(name, affiliation, email,
@@ -209,7 +205,6 @@ class GetPerson(Resource):
     """
     Retrieve a journal person's info (no security).
     """
-
     def get(self, email):
         person = ppl.read_one(email)
         if person:
@@ -296,7 +291,7 @@ class RolePeople(Resource):
         if not people:
             return ({
                 MESSAGE: f'No people found with role: {role}'},
-                HTTPStatus.NOT_FOUND)
+                    HTTPStatus.NOT_FOUND)
         return {role: people}, HTTPStatus.OK
 
 
@@ -375,13 +370,6 @@ class Manuscripts(Resource):
     def post(self):
         """Create a new manuscript"""
         data = request.json
-        user_id = request.args.get('user_id')
-
-        # Check if user is authorized to create manuscript
-        kwargs = {sec.LOGIN_KEY: 'any-login-key-for-now'}
-        if not sec.is_permitted(sec.PEOPLE, sec.CREATE, user_id, **kwargs):
-            raise wz.Forbidden(
-                'You do not have permission to create manuscripts.')
 
         required_fields = ['title',
                            'author', 'author_email',
@@ -417,41 +405,11 @@ class Manuscripts(Resource):
 
     def get(self):
         """Get all manuscripts"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
         try:
             manuscripts = read('manuscripts', no_id=False)
-            # Filter manuscripts based on user role
-            user_roles = user.get('roles', [])
-
-            # Editors can see all manuscripts
-            if any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
-                filtered_manuscripts = manuscripts
-            # Authors can only see their own manuscripts
-            elif rls.AUTHOR_CODE in user_roles:
-                filtered_manuscripts = [
-                    m for m in manuscripts
-                    if m.get('author_email') == user_id
-                ]
-            # Referees can only see manuscripts assigned to them
-            elif rls.RE_CODE in user_roles:
-                filtered_manuscripts = [
-                    m for m in manuscripts
-                    if user_id in m.get('referees', [])
-                ]
-            else:
-                filtered_manuscripts = []
-
-            for manuscript in filtered_manuscripts:
+            for manuscript in manuscripts:
                 manuscript['manu_id'] = str(manuscript['_id'])
-            return filtered_manuscripts, HTTPStatus.OK
+            return manuscripts, HTTPStatus.OK
         except Exception as e:
             raise wz.InternalServerError(
                 f"Error fetching manuscripts: {str(e)}")
@@ -461,20 +419,6 @@ class Manuscripts(Resource):
 class ManuscriptById(Resource):
     def delete(self, id):
         """Delete a manuscript by MongoDB _id"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        # Only editors can delete manuscripts
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
-        user_roles = user.get('roles', [])
-        if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
-            raise wz.Forbidden('Only editors can delete manuscripts')
-
         try:
             delete_count = delete('manuscripts', {'_id': ObjectId(id)})
             if delete_count > 0:
@@ -489,90 +433,17 @@ class ManuscriptById(Resource):
 
     def get(self, id):
         """Retrieve a manuscript by MongoDB _id"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
         try:
             manuscript = fetch_one("manuscripts", {"_id": ObjectId(id)})
-            if not manuscript:
-                return ({MESSAGE: 'Manuscript not found'},
-                        HTTPStatus.NOT_FOUND)
-
-            # Check if user has permission to view this manuscript
-            user_roles = user.get('roles', [])
-
-            # Editors can see all manuscripts
-            if any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
-                return manuscript, HTTPStatus.OK
-            # Authors can only see their own manuscripts
-            elif (rls.AUTHOR_CODE in user_roles and
-                    manuscript.get('author_email') == user_id):
-                return manuscript, HTTPStatus.OK
-            # Referees can only see manuscripts assigned to them
-            elif (rls.RE_CODE in user_roles and
-                    user_id in manuscript.get('referees', [])):
+            if manuscript:
                 return manuscript, HTTPStatus.OK
             else:
-                raise wz.Forbidden(
-                    'You do not have permission to view this manuscript')
-
+                return ({MESSAGE: 'Manuscript not found'},
+                        HTTPStatus.NOT_FOUND)
         except Exception as e:
             print(f"Error in get(): {e}")
             return ({MESSAGE: 'Invalid ID format or internal server error'},
                     HTTPStatus.BAD_REQUEST)
-
-    @api.expect(manuscript_model)
-    def put(self, id):
-        """Update a manuscript by MongoDB _id"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
-        try:
-            manuscript = fetch_one("manuscripts", {"_id": ObjectId(id)})
-            if not manuscript:
-                return ({MESSAGE: 'Manuscript not found'},
-                        HTTPStatus.NOT_FOUND)
-
-            # Check if user has permission to edit this manuscript
-            user_roles = user.get('roles', [])
-
-            # Only editors can edit manuscripts
-            if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                       for role in user_roles):
-                raise wz.Forbidden('Only editors can edit manuscripts')
-
-            # Update manuscript fields
-            update_data = request.json
-            update_fields = {}
-
-            for field in ['title', 'author', 'author_email', 'state',
-                          'abstract', 'text', 'referees']:
-                if field in update_data:
-                    update_fields[field] = update_data[field]
-
-            if update_fields:
-                update('manuscripts', {'_id': ObjectId(id)}, update_fields)
-                return ({MESSAGE: 'Manuscript updated successfully'},
-                        HTTPStatus.OK)
-            else:
-                return ({MESSAGE: 'No fields to update'},
-                        HTTPStatus.BAD_REQUEST)
-
-        except Exception as e:
-            print(f"Error in put(): {e}")
-            return ({MESSAGE: MSG_INTERNAL_ERROR},
-                    HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 text_model = api.model('Text', {
@@ -642,20 +513,6 @@ class Texts(Resource):
     @api.expect(text_model)
     def post(self):
         """Create a new text document"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        # Only editors can create text documents
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
-        user_roles = user.get('roles', [])
-        if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
-            raise wz.Forbidden('Only editors can create text documents')
-
         data = request.json
         text_doc = {
             'title': data.get('title'),
@@ -668,14 +525,6 @@ class Texts(Resource):
 
     def get(self):
         """Get all text documents"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
         try:
             texts = read('texts')
             return texts, HTTPStatus.OK
@@ -689,22 +538,13 @@ class Texts(Resource):
 class TextByTitle(Resource):
     def get(self, title):
         """Get the content of a text by title"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
         try:
             texts = read('texts')
             text_doc = next((text for text in texts if text['title'] == title),
                             None)
             if text_doc:
                 return {
-                    'title': text_doc['title'],
-                    'content': text_doc['content']
+                    'title': text_doc['title'], 'content': text_doc['content']
                 }, HTTPStatus.OK
             else:
                 return {MESSAGE: 'Text not found'}, HTTPStatus.NOT_FOUND
@@ -715,20 +555,6 @@ class TextByTitle(Resource):
 
     def delete(self, title):
         """Delete a text by its title"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        # Only editors can delete text documents
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
-        user_roles = user.get('roles', [])
-        if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
-            raise wz.Forbidden('Only editors can delete text documents')
-
         try:
             existing_text = fetch_one('texts', {'title': title})
             if existing_text:
@@ -745,20 +571,6 @@ class TextByTitle(Resource):
     @api.expect(text_model)
     def put(self, title):
         """Update the content of a text by title"""
-        user_id = request.args.get('user_id')
-        if not user_id:
-            raise wz.Unauthorized('User ID is required')
-
-        # Only editors can update text documents
-        user = ppl.read_one(user_id)
-        if not user:
-            raise wz.NotFound(f'No user found with email: {user_id}')
-
-        user_roles = user.get('roles', [])
-        if not any(role in [rls.ED_CODE, rls.CE_CODE, rls.ME_CODE]
-                   for role in user_roles):
-            raise wz.Forbidden('Only editors can update text documents')
-
         try:
             existing_text = fetch_one('texts', {'title': title})
             if existing_text:
@@ -783,7 +595,6 @@ class Roles(Resource):
     """
     This class handles reading person roles.
     """
-
     def get(self):
         """
         Retrieve the journal person roles.

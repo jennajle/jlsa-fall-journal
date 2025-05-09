@@ -1,6 +1,6 @@
 import pytest
 
-import security as sec
+import security.security as sec
 
 
 def test_check_login_good():
